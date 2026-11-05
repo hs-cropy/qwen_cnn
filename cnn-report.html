@@ -126,7 +126,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   <h2><span class="num">01</span>한눈에 보기</h2>
   <p class="sub">숫자는 평가 기준(어떤 사진으로 쟀는지)이 다르면 서로 비교할 수 없습니다. 카드마다 기준을 적었습니다.</p>
   <div class="grid g4">
-    <div class="card kpi good"><div class="label">운영 서버 모델</div><div class="value">256<small>px</small></div><div class="note">ResNet50 · 10클래스 (2026-11-06 확인)<br>448px 후보(val 99.68% / F1 0.962)는 교체 대기</div></div>
+    <div class="card kpi good"><div class="label">운영 서버 모델</div><div class="value">256<small>px</small></div><div class="note">ResNet50 · 10클래스 (2026-11-06 확인)<br>448px 교체는 PR #113 머지 대기</div></div>
     <div class="card kpi good"><div class="label">작업자 분리 시험셋 Macro F1</div><div class="value">0.917</div><div class="note">기준선 0.899 → 448px 0.917<br>새 촬영자 11,434장 기준</div></div>
     <div class="card kpi good"><div class="label">무노균병 재현율</div><div class="value">88.5<small>%</small></div><div class="note">기준선 74.4% → +14.1%p<br>(작업자 분리 시험셋)</div></div>
     <div class="card kpi bad"><div class="label">무검은무늬병 재현율</div><div class="value">54.2<small>%</small></div><div class="note">7가지 개선 시도에도 그대로<br>라벨 품질에 묶인 상한</div></div>
@@ -257,7 +257,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
         <li>작업자 78명을 통째로 train/val/test에 배정(seed 1568), 시험 11,434장. 기준선 Macro F1 0.899.</li>
         <li>ConvNeXt, 448px, 무 전용 2단계 분류기, 병반 박스 crop, 원본 해상도 crop, seed 반복을 차례로 시험(→ <a href="#experiments">실험</a>).</li>
       </ul>
-      <div class="result"><span class="tag ok">채택</span> 448px 입력만 유효 → 전체 데이터 448px 재학습본 교체 인계. 2026-11-06 기준 운영 서버는 아직 256px 모델.</div>
+      <div class="result"><span class="tag ok">채택</span> 448px 입력만 유효 → 전체 데이터 448px 재학습본과 교체 절차(<code>MODEL_SWAP_448.md</code>)를 PR #113으로 올림. 2026-11-06 기준 PR 머지 전이라 운영 서버는 아직 256px 모델.</div>
     </div></div>
 
     <div class="tl-item"><div class="card">
@@ -515,7 +515,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
     <tr><td>256 미세조정</td><td class="n">99.58%</td><td class="n">0.9624</td><td class="n">93.4%</td><td class="n">70.8%</td><td><span class="tag hold">보류</span></td></tr>
     <tr><td>384 미세조정</td><td class="n">99.56%</td><td class="n">0.9600</td><td class="n">100%</td><td class="n">62.5%</td><td><span class="tag no">미채택</span></td></tr>
     <tr><td>10클래스 (256, 기타 추가)</td><td class="n">99.57%</td><td class="n">0.958</td><td class="n">70/76</td><td class="n">17/24</td><td><span class="tag ok">서버 운영</span></td></tr>
-    <tr class="hl"><td>10클래스 448px 재학습</td><td class="n">99.68%</td><td class="n">0.962</td><td class="n">71/76</td><td class="n">16/24</td><td><span class="tag hold">교체 대기</span></td></tr>
+    <tr class="hl"><td>10클래스 448px 재학습</td><td class="n">99.68%</td><td class="n">0.962</td><td class="n">71/76</td><td class="n">16/24</td><td><span class="tag hold">PR #113 대기</span></td></tr>
   </table></div>
   <p class="caption">10클래스 행은 val 4,635장(기타 포함). 무노균병 24장은 한 장이 4.2%p라 잡음 범위입니다. 이 val은 학습 작업자와 겹쳐 일반화를 말해 주지 않습니다.</p>
 
@@ -594,7 +594,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
     <tr><td>재촬영 사진 가중치</td><td>0.6 (첫 사진 0.4)</td><td>다시점 융합</td></tr>
     <tr><td>오프라인 모델</td><td>ONNX 10클래스, 입력 256, 94.0MB, sha256 <code>f30a2b4e…</code></td><td>기기 실행 검증 전</td></tr>
   </table></div>
-  <div class="callout warn"><b>운영과 연구의 차이</b>작업자 분리 시험셋에서 효과가 확인된 448px 모델(무노균병 74.4% → 88.5%)은 아직 서버에 올라가지 않았습니다. 현재 사용자가 받는 진단은 256px 10클래스 모델 + decision-v3 재촬영 정책의 결과입니다.</div>
+  <div class="callout warn"><b>운영과 연구의 차이</b>작업자 분리 시험셋에서 효과가 확인된 448px 모델(무노균병 74.4% → 88.5%)의 교체 절차는 PR #113으로 올라가 있지만, 아직 머지·서버 반영 전입니다. 현재 사용자가 받는 진단은 256px 10클래스 모델 + decision-v3 재촬영 정책의 결과입니다.</div>
 </section>
 
 <!-- 8. 제품 대응 -->
@@ -632,7 +632,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   </div>
   <div class="table-wrap"><table>
     <tr><th>우선순위</th><th>할 일</th><th>이유</th></tr>
-    <tr><td class="n">1</td><td>448px 10클래스 모델 서버 교체</td><td>인계 문서(<code>MODEL_SWAP_448.md</code>) 작성 완료. 2026-11-06 운영 서버는 아직 256px(<code>bf9dff87…</code>). 교체 뒤 오프라인 ONNX 묶음도 448 입력으로 다시 만들어야 함</td></tr>
+    <tr><td class="n">1</td><td>PR #113 머지 → 448px 10클래스 모델 서버 교체</td><td>교체 절차(<code>MODEL_SWAP_448.md</code>)는 PR #113에 있음. 백엔드는 체크포인트의 입력 크기를 읽으므로 코드 수정 없이 파일만 바꾸면 됨. 2026-11-06 운영 서버는 아직 256px(<code>bf9dff87…</code>). 교체 뒤 오프라인 ONNX 묶음도 448 입력으로 다시 만들어야 함</td></tr>
     <tr><td class="n">2</td><td>전문가 재라벨 (시험셋 정답 교정)</td><td>검은무늬병 라벨 우선 112장 → 키트(review.html + 원본 crop 789장) 준비됨</td></tr>
     <tr><td class="n">3</td><td>무 잎 사진 직접 수집</td><td>11월 중순 이후·피해가 심한 검은무늬병, 잎 뒷면 근접 사진. 학습에 심한 검은무늬병이 거의 없음</td></tr>
     <tr><td class="n">4</td><td>별도 평가셋 확보</td><td>시험셋을 여러 번 써서 생긴 선택 편향 제거, 다른 지역·촬영자 성능 측정</td></tr>
