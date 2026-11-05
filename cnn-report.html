@@ -141,7 +141,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   <span class="eyebrow">크래파스 · Cropy 작물 병해 진단</span>
   <h1>CNN 병해 진단 모델 연구 보고서</h1>
   <p class="lead">고추·무·배추의 병해 6종과 정상 3종, 판별 불가 사진까지 10개 클래스로 분류하는 ResNet50 모델을 2026년 7월부터 11월까지 어떻게 만들고, 어떤 문제를 찾았고, 무엇이 실제로 성능을 바꿨는지 정리했습니다.</p>
-  <p class="meta">최종 갱신 2026-11-06 (운영 서버 상태 반영) · 담당 김헌영(PM·모델) · 학습 환경 Google Colab(T4) + Google Drive · 원 기록: Cropy 저장소 <code>docs/MODEL_SPEC.md</code>, <code>ml/README.md</code>, <code>ml/worker_split_v1/</code></p>
+  <p class="meta">최종 갱신 2026-11-06 (448px 모델 운영 반영 확인) · 담당 김헌영(PM·모델) · 학습 환경 Google Colab(T4) + Google Drive · 원 기록: Cropy 저장소 <code>docs/MODEL_SPEC.md</code>, <code>ml/README.md</code>, <code>ml/worker_split_v1/</code></p>
 </header>
 
 <!-- 1. 요약 -->
@@ -149,7 +149,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   <h2><span class="num">01</span>한눈에 보기</h2>
   <p class="sub">숫자는 평가 기준(어떤 사진으로 쟀는지)이 다르면 서로 비교할 수 없습니다. 카드마다 기준을 적었습니다.</p>
   <div class="grid g4">
-    <div class="card kpi good"><div class="label">운영 서버 모델</div><div class="value">256<small>px</small></div><div class="note">ResNet50 · 10클래스 (2026-11-06 확인)<br>448px 교체는 PR #113 머지 대기</div></div>
+    <div class="card kpi good"><div class="label">운영 서버 모델</div><div class="value">448<small>px</small></div><div class="note">ResNet50 · 10클래스 (2026-11-06 교체 확인)<br>공식 val 99.68% / Macro F1 0.962</div></div>
     <div class="card kpi good"><div class="label">작업자 분리 시험셋 Macro F1</div><div class="value">0.917</div><div class="note">기준선 0.899 → 448px 0.917<br>새 촬영자 11,434장 기준</div></div>
     <div class="card kpi good"><div class="label">무노균병 재현율</div><div class="value">88.5<small>%</small></div><div class="note">기준선 74.4% → +14.1%p<br>(작업자 분리 시험셋)</div></div>
     <div class="card kpi bad"><div class="label">무검은무늬병 재현율</div><div class="value">54.2<small>%</small></div><div class="note">7가지 개선 시도에도 그대로<br>라벨 품질에 묶인 상한</div></div>
@@ -185,7 +185,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
     <div class="table-wrap" style="margin:0"><table>
       <tr><th>항목</th><th>값</th></tr>
       <tr><td>아키텍처</td><td>ResNet50 (ImageNet 초기화 후 미세조정)</td></tr>
-      <tr><td>입력</td><td>RGB, 256px(현재 운영 서버) → 448px(교체 후보, 미반영), ImageNet 정규화</td></tr>
+      <tr><td>입력</td><td>RGB 448px(2026-11-06 운영 반영, 이전 256px), ImageNet 정규화</td></tr>
       <tr><td>출력</td><td>10클래스 softmax, 상위 3개 + 전체 분포 반환</td></tr>
       <tr><td>학습 설정</td><td>AdamW(wd 1e-4), cosine LR, label smoothing 0.1, 클래스 균형 샘플링, 흐림 증강, 검증 Macro F1로 모델 선택</td></tr>
       <tr><td>증강</td><td>RandomResizedCrop(0.7~1.0), 좌우반전, 회전 ±15°, ColorJitter, 가우시안 흐림</td></tr>
@@ -318,7 +318,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
         <li>작업자 78명을 통째로 train/val/test에 배정(seed 1568), 시험 11,434장. 기준선 Macro F1 0.899.</li>
         <li>ConvNeXt, 448px, 무 전용 2단계 분류기, 병반 박스 crop, 원본 해상도 crop, seed 반복을 차례로 시험(→ <a href="#experiments">작업자 분리 실험</a>).</li>
       </ul>
-      <div class="result"><span class="tag ok">채택</span> 448px 입력만 유효 → 전체 데이터 448px 재학습본과 교체 절차(<code>MODEL_SWAP_448.md</code>)를 PR #113으로 올림. 2026-11-06 기준 PR 머지 전이라 운영 서버는 아직 256px 모델.</div>
+      <div class="result"><span class="tag ok">채택</span> 448px 입력만 유효 → 전체 데이터 448px 재학습본과 교체 절차(<code>MODEL_SWAP_448.md</code>)를 PR #113으로 올림. PR은 11/05 머지, 11/06 운영 서버 교체 확인.</div>
     </div></div>
 
     <div class="tl-item"><div class="card">
@@ -370,7 +370,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
     <tr><td>11-02</td><td>실험 5·6 원본 해상도 crop</td><td>시험 무 290</td><td>seed 1회 +16%p → seed 3회 평균 68.9 vs 68.3%</td><td><span class="tag no">재현 실패</span></td></tr>
     <tr><td>11-02</td><td>실험 7 라벨 정리본</td><td>일치 166</td><td>균형 +1.4%p (경계 이동)</td><td><span class="tag no">기각</span></td></tr>
     <tr><td>11-02</td><td>무 쌍 전용 분류기 재검증</td><td>묶음 홀드아웃 420</td><td>본 71.4 / 본+전용 74.8 / 전용 76.6%, p≥0.84</td><td><span class="tag no">기각</span></td></tr>
-    <tr><td>11-02</td><td>448px 전체 데이터 재학습</td><td>공식 val 4,635</td><td>99.68% / F1 0.962, CPU 78 → 185ms</td><td><span class="tag hold">PR #113 대기</span></td></tr>
+    <tr><td>11-02</td><td>448px 전체 데이터 재학습</td><td>공식 val 4,635</td><td>99.68% / F1 0.962, CPU 78 → 185ms</td><td><span class="tag ok">운영 반영</span></td></tr>
     <tr><td>11-04</td><td>재촬영 게이트 넓히기</td><td>시험 예측</td><td>쌍 조건은 무 오답의 49%만 포착 → 1순위 조건으로</td><td><span class="tag ok">운영 반영</span></td></tr>
   </table></div>
   <p class="caption">"v0 val 785"는 9월 작업자 분할, "시험 11,434"는 10월 작업자 분리 시험셋 v1로 서로 다른 분할입니다.</p>
@@ -681,8 +681,8 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
     <tr><td>전체 데이터 기준 (256)</td><td class="n">99.43%</td><td class="n">0.9608</td><td class="n">90.8%</td><td class="n">79.2%</td><td>기준</td></tr>
     <tr><td>256 미세조정</td><td class="n">99.58%</td><td class="n">0.9624</td><td class="n">93.4%</td><td class="n">70.8%</td><td><span class="tag hold">보류</span></td></tr>
     <tr><td>384 미세조정</td><td class="n">99.56%</td><td class="n">0.9600</td><td class="n">100%</td><td class="n">62.5%</td><td><span class="tag no">미채택</span></td></tr>
-    <tr><td>10클래스 (256, 기타 추가)</td><td class="n">99.57%</td><td class="n">0.958</td><td class="n">70/76</td><td class="n">17/24</td><td><span class="tag ok">서버 운영</span></td></tr>
-    <tr class="hl"><td>10클래스 448px 재학습</td><td class="n">99.68%</td><td class="n">0.962</td><td class="n">71/76</td><td class="n">16/24</td><td><span class="tag hold">PR #113 대기</span></td></tr>
+    <tr><td>10클래스 (256, 기타 추가)</td><td class="n">99.57%</td><td class="n">0.958</td><td class="n">70/76</td><td class="n">17/24</td><td><span class="tag info">이전 운영</span></td></tr>
+    <tr class="hl"><td>10클래스 448px 재학습</td><td class="n">99.68%</td><td class="n">0.962</td><td class="n">71/76</td><td class="n">16/24</td><td><span class="tag ok">운영 중</span></td></tr>
   </table></div>
   <p class="caption">10클래스 행은 val 4,635장(기타 포함). 무노균병 24장은 한 장이 4.2%p라 잡음 범위입니다. 이 val은 학습 작업자와 겹쳐 일반화를 말해 주지 않습니다.</p>
 
@@ -759,7 +759,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   <h3>10월 · 외부 데이터</h3>
 <div class="chart" data-chart id="c-ext"><h4>외부(방글라데시) 무 잎 데이터를 섞은 이어학습</h4><p class="desc">epoch 0은 서버 모델 그대로. 방글라데시 검증 정확도는 빠르게 오르지만(같은 출처 사진이라 누수 가능), AI Hub 검증의 무노균병 재현율은 오히려 떨어집니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "외부(방글라데시) 무 잎 데이터를 섞은 이어학습", "x": [0, 1, 2, 3, 4], "series": [{"name": "AI Hub 검증 Macro F1", "v": [0.9585, 0.9525, 0.954, 0.9452, 0.9504], "c": 0}, {"name": "AI Hub 무노균병 재현율", "v": [0.7083, 0.6667, 0.625, 0.5417, 0.5417], "c": 1}, {"name": "방글라데시 검증 정확도", "v": [0.0859, 0.9982, 1.0, 0.9982, 1.0], "c": 2, "dash": true}], "ymin": 0.0, "ymax": 1.0, "yticks": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], "unit": "%", "xlabel": "epoch", "h": 250, "w": 640}</script></div>
   <h3>10월 말 · 10클래스와 448px 재학습</h3>
-<div class="chart-grid"><div class="chart" data-chart id="c-10-f1"><h4>10클래스 모델 — 256(운영) vs 448(교체 후보), Macro F1</h4><p class="desc">공식 val 4,635장(기타 포함). 학습 작업자와 겹치는 val이라 회귀 확인용입니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "10클래스 모델 — 256(운영) vs 448(교체 후보), Macro F1", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "256 (운영)", "v": [0.9398110289712729, 0.9543944679481946, 0.9288723793340286, 0.945929589531986, 0.9468033925964063, 0.9396135985631261, 0.9584795673369919, 0.9438705293292653], "c": 0, "best": 6}, {"name": "448 (후보)", "v": [0.9497617529735904, 0.950050223536824, 0.9418085862044384, 0.9541170143132913, 0.9542528873291278, 0.9615855774259341, 0.9598644314726323, 0.9553354983660372], "c": 1, "best": 5}], "ymin": 0.92, "ymax": 0.97, "yticks": [0.92, 0.93, 0.94, 0.95, 0.96, 0.97], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div><div class="chart" data-chart id="c-10-mu"><h4>10클래스 모델 — 무노균병 재현율 (24장)</h4><p class="desc">epoch마다 크게 오갑니다. 24장 표본이라 이 val로는 두 모델을 가를 수 없습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "10클래스 모델 — 무노균병 재현율 (24장)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "256 (운영)", "v": [0.5416666666666666, 0.6666666666666666, 0.7916666666666666, 0.5833333333333334, 0.4583333333333333, 0.5833333333333334, 0.7083333333333334, 0.5416666666666666], "c": 0}, {"name": "448 (후보)", "v": [0.75, 0.625, 0.5416666666666666, 0.625, 0.6666666666666666, 0.6666666666666666, 0.6666666666666666, 0.625], "c": 1}], "ymin": 0.4, "ymax": 0.9, "yticks": [0.4, 0.5, 0.6, 0.7, 0.8, 0.9], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div></div>
+<div class="chart-grid"><div class="chart" data-chart id="c-10-f1"><h4>10클래스 모델 — 256(이전 운영) vs 448(현재 운영), Macro F1</h4><p class="desc">공식 val 4,635장(기타 포함). 학습 작업자와 겹치는 val이라 회귀 확인용입니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "10클래스 모델 — 256(이전 운영) vs 448(현재 운영), Macro F1", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "256 (이전)", "v": [0.9398110289712729, 0.9543944679481946, 0.9288723793340286, 0.945929589531986, 0.9468033925964063, 0.9396135985631261, 0.9584795673369919, 0.9438705293292653], "c": 0, "best": 6}, {"name": "448 (현재 운영)", "v": [0.9497617529735904, 0.950050223536824, 0.9418085862044384, 0.9541170143132913, 0.9542528873291278, 0.9615855774259341, 0.9598644314726323, 0.9553354983660372], "c": 1, "best": 5}], "ymin": 0.92, "ymax": 0.97, "yticks": [0.92, 0.93, 0.94, 0.95, 0.96, 0.97], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div><div class="chart" data-chart id="c-10-mu"><h4>10클래스 모델 — 무노균병 재현율 (24장)</h4><p class="desc">epoch마다 크게 오갑니다. 24장 표본이라 이 val로는 두 모델을 가를 수 없습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "10클래스 모델 — 무노균병 재현율 (24장)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "256 (이전)", "v": [0.5416666666666666, 0.6666666666666666, 0.7916666666666666, 0.5833333333333334, 0.4583333333333333, 0.5833333333333334, 0.7083333333333334, 0.5416666666666666], "c": 0}, {"name": "448 (현재 운영)", "v": [0.75, 0.625, 0.5416666666666666, 0.625, 0.6666666666666666, 0.6666666666666666, 0.6666666666666666, 0.625], "c": 1}], "ymin": 0.4, "ymax": 0.9, "yticks": [0.4, 0.5, 0.6, 0.7, 0.8, 0.9], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div></div>
   <h3>10월 말~11월 · 작업자 분리 시험셋 v1 실험</h3>
 <div class="chart" data-chart id="c-v1-f1"><h4>작업자 분리 시험셋 v1 — 검증 Macro F1 (기준선 / ConvNeXt / 448)</h4><p class="desc">검증 작업자 사진(val) 기준. 세 모델 모두 epoch 1~8 동안 0.83~0.89 사이를 오르내릴 뿐 뚜렷하게 오르지 않아, epoch를 늘려도 이득이 없습니다. 448px가 대부분의 epoch에서 위에 있습니다. 최종 판정은 시험셋(11,434장)으로 했습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "작업자 분리 시험셋 v1 — 검증 Macro F1 (기준선 / ConvNeXt / 448)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "기준선 256", "v": [0.8630437388113881, 0.8601341071489322, 0.865446843405613, 0.8295440954232483, 0.8714124850460345, 0.8640048418443925, 0.8754018924260052, 0.8761689271279198], "c": 0, "best": 7}, {"name": "ConvNeXt-Tiny", "v": [0.8603603352657407, 0.8272867098152821, 0.8605199997496067, 0.8797050955718838, 0.8618396260309776, 0.8815328562610979, 0.8799552667935904, 0.8784395455299704], "c": 2, "best": 5}, {"name": "448px", "v": [0.8599761639218817, 0.8817669279453121, 0.8803632476925527, 0.8928736589223988, 0.8833475485026699, 0.8911710138492797, 0.8892906005902322, 0.8867857355028091], "c": 1, "best": 3}], "ymin": 0.82, "ymax": 0.9, "yticks": [0.82, 0.84, 0.86, 0.88, 0.9], "unit": "%", "xlabel": "epoch", "h": 240, "w": 640}</script></div>
   
@@ -771,23 +771,25 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
 <!-- 운영 현황 -->
 <section id="deploy">
   <h2><span class="num">11</span>운영 서버 현황 <small style="font-size:15px;color:var(--muted);font-weight:600">2026-11-06 확인</small></h2>
-  <p class="sub">배포 서버(<code>43.202.14.204.sslip.io</code>)의 공개 API(<code>/api/v1/ready</code>, <code>/api/v1/capabilities</code>, <code>/api/v1/offline/manifest</code>)로 확인한 실제 적용 상태입니다.</p>
+  <p class="sub">배포 서버(<code>43.202.14.204.sslip.io</code>)의 공개 API(<code>/api/v1/ready</code>, <code>/api/v1/capabilities</code>, <code>/api/v1/offline/manifest</code>)와 테스트 진단 1회의 응답(<code>model_version</code>·<code>preprocessing_version</code>)으로 확인한 실제 적용 상태입니다.</p>
   <div class="grid g3">
     <div class="card kpi good"><div class="label">서버 추론</div><div class="value">정상</div><div class="note">ready · DB 연결 · 실제 모델 로드<br>prediction_mode = model</div></div>
-    <div class="card kpi warn"><div class="label">서버 모델</div><div class="value">256<small>px</small></div><div class="note">10클래스 <code>full512_resnet50_other10_v1</code><br>해시 bf9dff87… · 448px 미반영</div></div>
+    <div class="card kpi good"><div class="label">서버 모델</div><div class="value">448<small>px</small></div><div class="note">10클래스 <code>full512_resnet50_448_other10_v1</code><br>해시 274527c5… (교체 문서와 일치)</div></div>
     <div class="card kpi good"><div class="label">판단 정책</div><div class="value">v3</div><div class="note">무 질병 1순위면 잎 뒷면 재촬영<br>PR #131 반영 확인</div></div>
   </div>
   <div class="table-wrap"><table>
     <tr><th>항목</th><th>운영 값</th><th>보고서상 근거</th></tr>
-    <tr><td>클래스</td><td>10개 (0~9, 판별 불가 포함)</td><td>6단계 기타 클래스 채택</td></tr>
-    <tr><td>서버 전처리</td><td><code>resize-256-imagenet-v1</code></td><td>10클래스 256px 모델</td></tr>
+    <tr><td>서버 모델</td><td>ResNet50 10클래스 448px, SHA256 <code>274527c5…45e7</code></td><td>9단계 448px 채택 → PR #113(11/05 머지) → 11/06 교체</td></tr>
+    <tr><td>서버 전처리</td><td><code>resize-448-imagenet-v1</code></td><td>체크포인트의 <code>img_size=448</code>을 읽음(코드 수정 없음)</td></tr>
+    <tr><td>클래스</td><td>10개 (0~9, 판별 불가 포함)</td><td>7단계 기타 클래스 채택</td></tr>
     <tr><td>저신뢰 기준</td><td>0.8</td><td>1순위 확률이 0.8 미만이면 저신뢰 판정</td></tr>
-    <tr><td>혼동쌍</td><td>[무검은무늬병, 무노균병], [배추검은썩음병, 배추노균병] · 확률 차이 0.2 미만</td><td>2단계 혼동 분석</td></tr>
+    <tr><td>혼동쌍</td><td>[무검은무늬병, 무노균병], [배추검은썩음병, 배추노균병] · 확률 차이 0.2 미만</td><td>1단계 혼동 분석</td></tr>
     <tr><td>1순위만으로 재촬영</td><td>[무검은무늬병, 무노균병]</td><td>분석 노트: 쌍 조건 게이트는 무 오류의 49%만 잡음</td></tr>
     <tr><td>재촬영 사진 가중치</td><td>0.6 (첫 사진 0.4)</td><td>다시점 융합</td></tr>
-    <tr><td>오프라인 모델</td><td>ONNX 10클래스, 입력 256, 94.0MB, sha256 <code>f30a2b4e…</code></td><td>기기 실행 검증 전</td></tr>
+    <tr><td>오프라인 모델</td><td>ONNX 10클래스, 입력 256(이전 서버 모델 <code>bf9dff87…</code>), sha256 <code>f30a2b4e…</code></td><td>교체 문서대로 256 유지 · 기기 실행 검증 전</td></tr>
   </table></div>
-  <div class="callout warn"><b>운영과 연구의 차이</b>작업자 분리 시험셋에서 효과가 확인된 448px 모델(무노균병 74.4% → 88.5%)의 교체 절차는 PR #113으로 올라가 있지만, 아직 머지·서버 반영 전입니다. 현재 사용자가 받는 진단은 256px 10클래스 모델 + decision-v3 재촬영 정책의 결과입니다.</div>
+  <div class="callout ok"><b>연구 결과가 운영에 반영됨</b>작업자 분리 시험셋에서 효과가 확인된 448px 모델(무노균병 74.4% → 88.5%, Macro F1 0.899 → 0.917)이 2026-11-06 운영 서버에 올라갔습니다. 테스트 진단 1회(무노균병 라벨 사진)의 응답 시간은 업로드 포함 약 1.8초였고, 1순위가 무 질병이라 decision-v3의 잎 뒷면 재촬영 안내가 붙었습니다.</div>
+  <div class="callout warn"><b>남은 차이</b>오프라인 화면의 브라우저 모델은 여전히 이전 256px 모델이라, 같은 사진도 온라인(448)과 오프라인(256) 결과가 다를 수 있습니다. 서버 448의 응답 시간은 실사용 부하에서 한 번 더 확인이 필요합니다.</div>
 </section>
 
 <!-- 학습 기록 -->
@@ -849,7 +851,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   </div>
   <div class="table-wrap"><table>
     <tr><th>우선순위</th><th>할 일</th><th>이유</th></tr>
-    <tr><td class="n">1</td><td>PR #113 머지 → 448px 10클래스 모델 서버 교체</td><td>교체 절차(<code>MODEL_SWAP_448.md</code>)는 PR #113에 있음. 백엔드는 체크포인트의 입력 크기를 읽으므로 코드 수정 없이 파일만 바꾸면 됨. 2026-11-06 운영 서버는 아직 256px(<code>bf9dff87…</code>). 교체 뒤 오프라인 ONNX 묶음도 448 입력으로 다시 만들어야 함</td></tr>
+    <tr><td class="n">1</td><td>448px 교체 후 점검 · 오프라인 모델 정리</td><td>서버는 11/06 448px로 교체 완료. 실사용 응답 시간을 확인하고, 오프라인 브라우저 모델(256)을 유지할지 448로 다시 만들지 결정 — 지금은 온라인·오프라인 결과가 다를 수 있음</td></tr>
     <tr><td class="n">2</td><td>전문가 재라벨 (시험셋 정답 교정)</td><td>검은무늬병 라벨 우선 112장 → 키트(review.html + 원본 crop 789장) 준비됨</td></tr>
     <tr><td class="n">3</td><td>무 잎 사진 직접 수집</td><td>11월 중순 이후·피해가 심한 검은무늬병, 잎 뒷면 근접 사진. 학습에 심한 검은무늬병이 거의 없음</td></tr>
     <tr><td class="n">4</td><td>별도 평가셋 확보</td><td>시험셋을 여러 번 써서 생긴 선택 편향 제거, 다른 지역·촬영자 성능 측정</td></tr>
