@@ -109,7 +109,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   <span class="brand">Cropy CNN</span>
   <div class="nav-links">
     <a href="#summary">요약</a><a href="#model">모델</a><a href="#timeline">연구 과정</a><a href="#ledger">실험 대장</a><a href="#dataset">데이터셋</a>
-    <a href="#labels">라벨 문제</a><a href="#causes">원인 조사</a><a href="#experiments">실험</a><a href="#metrics">성능 지표</a><a href="#deploy">운영 현황</a><a href="#next">결론·다음 단계</a>
+    <a href="#labels">라벨 문제</a><a href="#causes">원인 조사</a><a href="#experiments">실험</a><a href="#metrics">성능 지표</a><a href="#deploy">운영 현황</a><a href="#logs">학습 기록</a><a href="#next">결론·다음 단계</a>
   </div>
 </div></nav>
 
@@ -133,19 +133,20 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   </div>
   <div class="callout info">
     <b>핵심 결론</b>
-    같은 작업자의 사진으로 잰 검증 정확도(99%대)는 새 사용자 성능을 말해 주지 않아, 촬영 작업자 78명을 통째로 나눈 <b>작업자 분리 시험셋</b>을 만들어 판정 기준으로 삼았습니다. 7월부터 이어진 실험 32건(샘플링·해상도·미세조정·crop·외부 데이터·전용 분류기·백본·라벨 정리 등) 가운데 새 촬영자 기준으로 효과가 확인된 모델 변경은 <b>입력 해상도 448px</b>뿐이었고, 판별 불가 클래스와 저신뢰 기준 0.8은 운영에 반영됐습니다. 남은 약점인 무 두 질병의 혼동은 모델이 아니라 <b>AI Hub 라벨 품질과 데이터 규모</b> 문제로 결론 내렸고, 제품에서는 무 질병이 1순위로 나오면 잎 뒷면을 다시 찍게 하는 방식으로 대응합니다.
+    같은 작업자의 사진으로 잰 검증 정확도(99%대)는 새 사용자 성능을 말해 주지 않아, 촬영 작업자 78명을 통째로 나눈 <b>작업자 분리 시험셋</b>을 만들어 판정 기준으로 삼았습니다. 7월부터 이어진 실험 33건(샘플링·해상도·미세조정·crop·외부 데이터·전용 분류기·백본·라벨 정리 등) 가운데 새 촬영자 기준으로 효과가 확인된 모델 변경은 <b>입력 해상도 448px</b>뿐이었고, 판별 불가 클래스와 저신뢰 기준 0.8은 운영에 반영됐습니다. 남은 약점인 무 두 질병의 혼동은 모델이 아니라 <b>AI Hub 라벨 품질과 데이터 규모</b> 문제로 결론 내렸고, 제품에서는 무 질병이 1순위로 나오면 잎 뒷면을 다시 찍게 하는 방식으로 대응합니다.
   </div>
   <div class="card" style="margin-top:16px">
     <ol class="toc">
       <li><a href="#model">모델 사양과 클래스 정의</a></li>
       <li><a href="#timeline">연구 과정 (단계별 타임라인)</a></li>
-      <li><a href="#ledger">실험 대장 (전체 실험 32건)</a></li>
+      <li><a href="#ledger">실험 대장 (전체 실험 33건)</a></li>
       <li><a href="#dataset">데이터셋의 상태</a></li>
       <li><a href="#labels">라벨·데이터 품질 문제</a></li>
       <li><a href="#causes">무 질병 오류의 원인 조사</a></li>
       <li><a href="#experiments">작업자 분리 시험셋 실험 1~7</a></li>
       <li><a href="#metrics">단계별 성과와 성능 개선 지표</a></li>
       <li><a href="#deploy">운영 서버 현황</a></li>
+      <li><a href="#logs">학습 기록 보관 현황</a></li>
       <li><a href="#product">제품 쪽 대응 (유도촬영)</a></li>
       <li><a href="#next">결론과 다음 단계</a></li>
     </ol>
@@ -249,7 +250,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
         <li>무노균병 오답 사진을 <b>좌우 반전만 해도</b> 검은무늬병 88.46% → 노균병 80.05%로 판정이 뒤집힘. 특징 공간의 최근접 학습 사진도 통째로 바뀜(→ <a href="#causes">원인 조사</a>).</li>
         <li>입력 조건 실험: 병반 박스 안을 가리면 무노균병 19 → 5/24 → 모델은 실제로 병반을 봄.</li>
         <li>브라우저 오프라인용 FP32 ONNX 변환: PyTorch 대비 최대 logit 차이 1.4×10⁻⁶. PC CPU 추론(224) 예열 후 중앙값 166ms.</li>
-        <li>반전 일관성 손실 학습 노트북 준비(결과는 저장소에 없음).</li>
+        <li>반전 일관성 손실(JS) 학습: 대조군·실험군 모두 최고 모델이 학습 전(epoch 0)이고 지표가 동일(99.43% / F1 0.9608). 마지막 epoch 반전 판정 변화율 0.49 → 0.47%만 줄고 무노균병은 둘 다 70.83% → 기각.</li>
       </ul>
     </div></div>
 
@@ -331,6 +332,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
     <tr><td>10-05</td><td>기존 + crop 제거 확률 평균</td><td>무 val 100</td><td>무노균병 19, 무검은무늬병 71/76 (기존 69)</td><td><span class="tag no">기각</span></td></tr>
     <tr><td>10-08</td><td>브라우저 ONNX 변환</td><td>같은 입력 3개</td><td>최대 logit 차이 1.4×10⁻⁶</td><td><span class="tag ok">배포</span></td></tr>
     <tr><td>10-13</td><td>무엇을 보고 판정하나</td><td>무 val 100</td><td>좌우 반전으로 판정 뒤집힘, 박스 안 가리면 무노균병 5/24</td><td><span class="tag info">원인 조사</span></td></tr>
+    <tr><td>10-13</td><td>반전 일관성 손실 학습</td><td>공식 val 4,070</td><td>대조군·실험군 동일(F1 0.9608), 반전 변화율 0.49 → 0.47%</td><td><span class="tag no">기각</span></td></tr>
     <tr><td>10-13</td><td>TTA(반전 평균)</td><td>무 val</td><td>무노균병 19 → 17</td><td><span class="tag no">기각</span></td></tr>
     <tr><td>10월</td><td>외부(방글라데시) 무 잎 데이터</td><td>공식 val</td><td>99.57 → 99.29%, 무노균병 70.8 → 62.5%</td><td><span class="tag no">기각</span></td></tr>
     <tr><td>10-25</td><td>PC CPU 추론 속도 (224)</td><td>30장</td><td>중앙값 166ms, p95 229ms, 메모리 약 498MiB</td><td><span class="tag info">측정</span></td></tr>
@@ -740,9 +742,33 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   <div class="callout warn"><b>운영과 연구의 차이</b>작업자 분리 시험셋에서 효과가 확인된 448px 모델(무노균병 74.4% → 88.5%)의 교체 절차는 PR #113으로 올라가 있지만, 아직 머지·서버 반영 전입니다. 현재 사용자가 받는 진단은 256px 10클래스 모델 + decision-v3 재촬영 정책의 결과입니다.</div>
 </section>
 
+<!-- 학습 기록 -->
+<section id="logs">
+  <h2><span class="num">11</span>학습 기록 보관 현황</h2>
+  <p class="sub">epoch별 기록(<code>history.json</code>·<code>history.jsonl</code>)과 선택 모델의 검증 지표(<code>val_metrics.json</code>)가 어디에 있는지 정리했습니다. 2026-11-06 Google Drive와 Cropy 저장소를 대조한 결과입니다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>시기</th><th>실행</th><th>epoch별 기록</th><th>보관 위치</th></tr>
+    <tr><td>07</td><td>사전 실험 (ResNet18, 데이터 확장)</td><td><span class="tag no">없음</span></td><td>작업 메모의 수치만 남음</td></tr>
+    <tr><td>09-03</td><td>첫 9클래스 ResNet50 (224)</td><td><span class="tag no">없음</span></td><td>체크포인트와 평가 결과만(<code>docs/MODEL_SPEC.md</code>)</td></tr>
+    <tr><td>09-03</td><td>무 쌍 전용 ResNet18 (<code>pair_mu.pth</code>)</td><td><span class="tag no">없음</span></td><td>test 결과만</td></tr>
+    <tr><td>09-17</td><td>3주차 이어학습 (일반·균형)</td><td><span class="tag ok">있음</span></td><td>저장소 <code>output/colab/cropy_week3_results.zip</code></td></tr>
+    <tr><td>09-21 ~ 09-23</td><td>작업자 분할 v0 (224 1회, 256 3회)</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy/results</code>, <code>cropy/results_256</code> · 저장소 <code>output/colab/group*_analysis</code></td></tr>
+    <tr><td>10-02</td><td>전체 데이터 기준 모델 (256)</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_runs/full512_resnet50_v1</code></td></tr>
+    <tr><td>10-04</td><td>학습 crop 제거</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_runs/full512_resnet50_full_resize_v1</code> (training.log 포함)</td></tr>
+    <tr><td>10-05</td><td>256 / 384 미세조정</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_runs/resolution_finetune_20261005</code> (training_256/384.log 포함)</td></tr>
+    <tr><td>10-13</td><td>반전 일관성 학습 (대조군·실험군)</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_runs/flip_consistency_20261013_v1</code></td></tr>
+    <tr><td>10-26</td><td>10클래스 (기타 추가)</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_runs/full512_resnet50_other10_v1</code></td></tr>
+    <tr><td>10-27</td><td>무 쌍 전용 분류기 5-fold · 홀드아웃</td><td><span class="tag hold">일부</span></td><td>Drive <code>cropy_mu_pair</code> — 홀드아웃은 epoch 기록 있음, 5-fold는 결과·예측(cv_results, oof)만</td></tr>
+    <tr><td>10-28</td><td>외부(방글라데시) 데이터 이어학습</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_ext/radish_bd/finetune_v1</code></td></tr>
+    <tr><td>10-28</td><td>작업자 분리 v1 기준선 · ConvNeXt</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_testset/baseline_v1</code>, <code>convnext_v1</code></td></tr>
+    <tr><td>10-30 ~ 11-02</td><td>448px · 무 전용 2단계 · 병반 crop · 원본 crop(3) · seed 반복(6) · 라벨 정리본(5) · 448 전체 재학습</td><td><span class="tag ok">있음</span></td><td>Drive <code>cropy_testset/</code> 아래 실행별 폴더 · 요약 리포트는 저장소 <code>ml/worker_split_v1/*.json</code></td></tr>
+  </table></div>
+  <p class="caption">9월 중순 이후 Colab 실험은 모두 epoch별 기록이 남아 있습니다. 기록이 없는 것은 Colab 이전에 로컬에서 학습한 9월 초 이전 모델들입니다. 라벨 정리본 대조군 seed 42는 448px 실행(<code>hires448_v1</code>)을 그대로 씁니다.</p>
+</section>
+
 <!-- 8. 제품 대응 -->
 <section id="product">
-  <h2><span class="num">11</span>제품 쪽 대응 — 혼동쌍 유도촬영</h2>
+  <h2><span class="num">12</span>제품 쪽 대응 — 혼동쌍 유도촬영</h2>
   <p class="sub">모델로 풀리지 않는 혼동은 사진을 한 장 더 받아서 풉니다. 노균병의 흰 곰팡이는 잎 뒷면에서 확인되기 때문입니다.</p>
   <div class="grid g2">
     <div class="card">
@@ -764,7 +790,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
 
 <!-- 9. 결론 -->
 <section id="next">
-  <h2><span class="num">12</span>결론과 다음 단계</h2>
+  <h2><span class="num">13</span>결론과 다음 단계</h2>
   <div class="callout ok">
     <b>지금까지의 결론</b>
     <ul class="clean">
