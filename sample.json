@@ -1,0 +1,936 @@
+[
+ {
+  "function": "chit_chat",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "주식 지금 사도 돼",
+  "context": {
+   "ui_stage": "no_photo"
+  },
+  "output": "<hs_8>()<hs_end>"
+ },
+ {
+  "function": "chit_chat",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "영어로 사과가 뭐야",
+  "context": {
+   "ui_stage": "analyzing"
+  },
+  "output": "<hs_8>()<hs_end>"
+ },
+ {
+  "function": "chit_chat",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "해가 몇 시에 져",
+  "context": {
+   "ui_stage": "photo_ready"
+  },
+  "output": "<hs_8>()<hs_end>"
+ },
+ {
+  "function": "chit_chat",
+  "split": "validation",
+  "augmentation": "dialect_gyeongsang",
+  "stt": false,
+  "user_text": "선거는 언제고",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "고추",
+   "predicted_crop": "고추",
+   "disease_name": "고추 탄저병",
+   "category": "disease",
+   "confidence": 0.91,
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "pesticides": [
+    "포룸디 (디메토모르프.디티아논 수화제)"
+   ]
+  },
+  "output": "<hs_8>()<hs_end>"
+ },
+ {
+  "function": "chit_chat",
+  "split": "validation",
+  "augmentation": "spacing",
+  "stt": false,
+  "user_text": "이름이뭐예요",
+  "context": {
+   "ui_stage": "photo_ready"
+  },
+  "output": "<hs_8>()<hs_end>"
+ },
+ {
+  "function": "clarify_request",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "지금 관리할 것은 배추인데 이 무 관리 안내를 그대로 따라도 되나요",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "무 검은무늬병",
+   "category": "disease"
+  },
+  "output": "<hs_5>(target=1)<hs_end>"
+ },
+ {
+  "function": "clarify_request",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "화 면을 보고 질문할게요 화면의 정도라는 게 무엇인가요",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "무 검은무늬병",
+   "confidence": 0.91,
+   "severity": "high"
+  },
+  "output": "<hs_5>(target=3)<hs_end>"
+ },
+ {
+  "function": "clarify_request",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "지금 앱을 켜 두 었어 심한 거라는 말이 어느 항목인가",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "배추 정상",
+   "confidence": 0.91,
+   "severity": "high"
+  },
+  "output": "<hs_5>(target=3)<hs_end>"
+ },
+ {
+  "function": "clarify_request",
+  "split": "validation",
+  "augmentation": "dialect_chungcheong",
+  "stt": false,
+  "user_text": "전화로 말하는 중이에유 이 작물 불일치를 먼저 확인하고 싶어유",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "배추",
+   "crop_mismatch": true
+  },
+  "output": "<hs_5>(target=1)<hs_end>"
+ },
+ {
+  "function": "clarify_request",
+  "split": "train",
+  "augmentation": "spacing",
+  "stt": false,
+  "user_text": "내 작물은 고추인데무 약을 쳐도 되나",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "고추",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.72,
+   "crop_mismatch": true,
+   "prediction_mode": "model",
+   "decision_status": "crop_mismatch"
+  },
+  "output": "<hs_5>(target=1)<hs_end>"
+ },
+ {
+  "function": "clarify_request",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": true,
+  "user_text": "고추 가루병 설명해주세여",
+  "context": {
+   "ui_stage": "result"
+  },
+  "output": "<hs_5>(target=8)<hs_end>"
+ },
+ {
+  "function": "get_care_information",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "배추 분류 기록을 설명받고 싶어 현재 자료로 작업 우선순위를 정해주세요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 검은썩음병",
+   "category": "disease",
+   "confidence": 0.72,
+   "severity": "high",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 검은썩음병",
+     "confidence": 0.72
+    },
+    {
+     "name": "배추 정상",
+     "confidence": 0.27
+    }
+   ]
+  },
+  "output": "<hs_3>(topic=3)<hs_end>"
+ },
+ {
+  "function": "get_care_information",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "이번 배추 사진 결과를 보고 있어 지금 관리 순서를 결정할 근거가 있나요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 검은썩음병",
+   "category": "disease",
+   "confidence": 0.82,
+   "severity": "high",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 검은썩음병",
+     "confidence": 0.82
+    },
+    {
+     "name": "배추 정상",
+     "confidence": 0.17
+    }
+   ]
+  },
+  "output": "<hs_3>(topic=3)<hs_end>"
+ },
+ {
+  "function": "get_care_information",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "지금 무 결과 화면을 열었어 이 설명에 발생 요인이 기록되어 있나",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.97,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "무 검은무늬병",
+     "confidence": 0.97
+    },
+    {
+     "name": "무 정상",
+     "confidence": 0.02
+    }
+   ]
+  },
+  "output": "<hs_3>(topic=1)<hs_end>"
+ },
+ {
+  "function": "get_care_information",
+  "split": "validation",
+  "augmentation": "dialect_chungcheong",
+  "stt": true,
+  "user_text": "무 노굔병 자료에서 약말고 확인할 관리 항몽이 머예유",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "무 노균병",
+   "category": "disease"
+  },
+  "output": "<hs_3>(topic=2)<hs_end>"
+ },
+ {
+  "function": "get_care_information",
+  "split": "train",
+  "augmentation": "spacing",
+  "stt": false,
+  "user_text": "약 안 쓰고 관리하 는 방법 있어",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 노균병",
+   "category": "disease",
+   "confidence": 0.86,
+   "crop_mismatch": false,
+   "prediction_mode": "model"
+  },
+  "output": "<hs_3>(topic=2)<hs_end>"
+ },
+ {
+  "function": "get_care_information",
+  "split": "train",
+  "augmentation": "original",
+  "stt": true,
+  "user_text": "고추 흰가루병 자료의 환경 관리 항목만 말해주세여",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "고추 흰가루병",
+   "category": "disease"
+  },
+  "output": "<hs_3>(topic=2)<hs_end>"
+ },
+ {
+  "function": "get_diagnosis",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "무 결 과에서 한 가지 궁금해요 표시된 심각도가 현장에서 잰 값인가요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.91,
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "무 검은무늬병",
+     "confidence": 0.91
+    },
+    {
+     "name": "무 정상",
+     "confidence": 0.08
+    }
+   ]
+  },
+  "output": "<hs_0>(topic=2)<hs_end>"
+ },
+ {
+  "function": "get_diagnosis",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "배추 사진을 화긴하고 있어요 가장 높게 나온 병명 후보를 알려주세요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 정상",
+   "category": "normal",
+   "confidence": 0.72,
+   "severity": "low",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 정상",
+     "confidence": 0.72
+    },
+    {
+     "name": "배추 검은썩음병",
+     "confidence": 0.27
+    }
+   ]
+  },
+  "output": "<hs_0>(topic=1)<hs_end>"
+ },
+ {
+  "function": "get_diagnosis",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "내 배추 결과를 확인하는 중이에요 진단 기록의 버전 정보가 빠져 있나",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 정상",
+   "category": "normal",
+   "confidence": 0.97,
+   "severity": "low",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 정상",
+     "confidence": 0.97
+    },
+    {
+     "name": "배추 검은썩음병",
+     "confidence": 0.02
+    }
+   ]
+  },
+  "output": "<hs_0>(topic=4)<hs_end>"
+ },
+ {
+  "function": "get_diagnosis",
+  "split": "validation",
+  "augmentation": "dialect_chungcheong",
+  "stt": false,
+  "user_text": "배추 분류 기록을 설명받고 싶어유 어느 버전으로 계산한 결과인지 알려주세유",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 노균병",
+   "category": "disease",
+   "confidence": 0.56,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 노균병",
+     "confidence": 0.56
+    },
+    {
+     "name": "배추 정상",
+     "confidence": 0.41
+    }
+   ]
+  },
+  "output": "<hs_0>(topic=4)<hs_end>"
+ },
+ {
+  "function": "get_diagnosis",
+  "split": "train",
+  "augmentation": "spacing",
+  "stt": false,
+  "user_text": "임시 결과라 고 돼 있는데 무슨 뜻이에요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.55,
+   "crop_mismatch": false,
+   "prediction_mode": "legacy"
+  },
+  "output": "<hs_0>(topic=4)<hs_end>"
+ },
+ {
+  "function": "get_diagnosis",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": true,
+  "user_text": "지난주랑 비교해 이번주에 얼매나 조아졋나요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 정상",
+   "category": "normal",
+   "confidence": 0.84,
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 정상",
+     "confidence": 0.84
+    }
+   ]
+  },
+  "output": "<hs_0>(topic=7)<hs_end>"
+ },
+ {
+  "function": "get_pesticide_information",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "사용할지 결정하기 전에 현재 표시된 제품의 자료가 담고 있는 내용과 한계를 함께 요약해주이소",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무노균병",
+   "category": "disease",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "pesticides": [
+    "가상 제품 에이"
+   ]
+  },
+  "output": "<hs_4>(topic=8, product=1)<hs_end>"
+ },
+ {
+  "function": "get_pesticide_information",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "물통 크기만 알고 있는데 현재 표시된 재품을 넣을 양을 계산할 근거가 있는지 화긴해주세여",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "고추",
+   "predicted_crop": "고추",
+   "disease_name": "고추탄저병",
+   "category": "disease",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "pesticides": [
+    "가상 제품 에이"
+   ]
+  },
+  "output": "<hs_4>(topic=2, product=1)<hs_end>"
+ },
+ {
+  "function": "get_pesticide_information",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "지난번에 한 번 썼어 현재 표시된 제품을 다시 쓰는 간격과 최대 횟수가 기록돼 있나",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추노균병",
+   "category": "disease",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "pesticides": [
+    "가상 제품 에이"
+   ]
+  },
+  "output": "<hs_4>(topic=3, product=1)<hs_end>"
+ },
+ {
+  "function": "get_pesticide_information",
+  "split": "validation",
+  "augmentation": "dialect_chungcheong",
+  "stt": false,
+  "user_text": "저렴한지보다 방제 효과 차이가 궁금해유 현재 목록의 제품을 효능으로 비교할 자료가 있나유",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무노균병",
+   "category": "disease",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "pesticides": [
+    "가상 제품 에이",
+    "가상 제품 비"
+   ]
+  },
+  "output": "<hs_4>(topic=10, product=2)<hs_end>"
+ },
+ {
+  "function": "get_pesticide_information",
+  "split": "train",
+  "augmentation": "original",
+  "stt": true,
+  "user_text": "재품 에이에 드러잇는 성분을 말해주세여",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "무 노균병",
+   "pesticides": [
+    "검증 전 제품 A"
+   ]
+  },
+  "output": "<hs_4>(topic=7, product=1)<hs_end>"
+ },
+ {
+  "function": "get_prediction_metrics",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "무 사진 결과를 처음 보고 있어요 목록의 두 후보 점수 차이만 읽어주세요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.97,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "무 검은무늬병",
+     "confidence": 0.97
+    },
+    {
+     "name": "무 정상",
+     "confidence": 0.02
+    }
+   ]
+  },
+  "output": "<hs_1>(topic=5)<hs_end>"
+ },
+ {
+  "function": "get_prediction_metrics",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "배추 사진 결과를 처음 보고 있어요 상위 목록의 점수 분포만 확인해주세요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 정상",
+   "category": "normal",
+   "confidence": 0.44,
+   "severity": "low",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 정상",
+     "confidence": 0.44
+    },
+    {
+     "name": "배추 검은썩음병",
+     "confidence": 0.41
+    }
+   ]
+  },
+  "output": "<hs_1>(topic=3)<hs_end>"
+ },
+ {
+  "function": "get_prediction_metrics",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "이번 배추 사진 결과를 보고 있어 상위 두 후보의 이름을 순서대로 알려줘",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 정상",
+   "category": "normal",
+   "confidence": 0.91,
+   "severity": "low",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 정상",
+     "confidence": 0.91
+    },
+    {
+     "name": "배추 검은썩음병",
+     "confidence": 0.08
+    }
+   ]
+  },
+  "output": "<hs_1>(topic=2)<hs_end>"
+ },
+ {
+  "function": "get_prediction_metrics",
+  "split": "validation",
+  "augmentation": "dialect_jeolla",
+  "stt": false,
+  "user_text": "이번 배추 사진 결과를 보고 있어 신뢰도는 어느 정도로 나온 거여",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 노균병",
+   "category": "disease",
+   "confidence": 0.82,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 노균병",
+     "confidence": 0.82
+    },
+    {
+     "name": "배추 정상",
+     "confidence": 0.17
+    }
+   ]
+  },
+  "output": "<hs_1>(topic=1)<hs_end>"
+ },
+ {
+  "function": "get_prediction_metrics",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": true,
+  "user_text": "무 거믄무늬병 다음 후보랑 점쑤 차이가 얼마야",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.79,
+   "prediction_mode": "model"
+  },
+  "output": "<hs_1>(topic=5)<hs_end>"
+ },
+ {
+  "function": "get_recapture_guidance",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "배추 결과에서 한 가지 궁금해요 현재 기록의 촬영 방법을 쉽게 알려주세요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 검은썩음병",
+   "category": "disease",
+   "confidence": 0.52,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model"
+  },
+  "output": "<hs_2>(topic=1)<hs_end>"
+ },
+ {
+  "function": "get_recapture_guidance",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "무 사진을 확인하고 있어요 이 촬영 안내를 띄운 이유를 알려주세요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.52,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model"
+  },
+  "output": "<hs_2>(topic=2)<hs_end>"
+ },
+ {
+  "function": "get_recapture_guidance",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "무 분류 기록을 설명받고 싶어 재촬영 요청의 근거가 기록돼 있나",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.52,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model"
+  },
+  "output": "<hs_2>(topic=4)<hs_end>"
+ },
+ {
+  "function": "get_usage_guidance",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "사진 골랐어 그다음은",
+  "context": {
+   "ui_stage": "photo_ready"
+  },
+  "output": "<hs_7>(topic=1, delivery=1)<hs_end>"
+ },
+ {
+  "function": "get_usage_guidance",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "할 일을 순서대로 천천히 알려 줘",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "고추",
+   "predicted_crop": "고추",
+   "disease_name": "고추 탄저병",
+   "category": "disease",
+   "confidence": 0.91,
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "pesticides": [
+    "포룸디 (디메토모르프.디티아논 수화제)"
+   ]
+  },
+  "output": "<hs_7>(topic=1, delivery=2)<hs_end>"
+ },
+ {
+  "function": "get_usage_guidance",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "결과는 떴어 이어서 할 일을 말해 줘",
+  "context": {
+   "ui_stage": "result",
+   "disease_name": "평가용 분류 후보",
+   "category": "disease",
+   "confidence": 0.41,
+   "crop_mismatch": false,
+   "prediction_mode": "mock",
+   "decision_status": "low_confidence",
+   "save_status": "saved"
+  },
+  "output": "<hs_7>(topic=1, delivery=1)<hs_end>"
+ },
+ {
+  "function": "get_usage_guidance",
+  "split": "validation",
+  "augmentation": "dialect_jeolla",
+  "stt": false,
+  "user_text": "작물을 모르겠으면 어떻게 혀",
+  "context": {
+   "ui_stage": "photo_ready"
+  },
+  "output": "<hs_7>(topic=3, delivery=1)<hs_end>"
+ },
+ {
+  "function": "get_usage_guidance",
+  "split": "validation",
+  "augmentation": "spacing",
+  "stt": false,
+  "user_text": "왜 이렇게 오 래 걸려",
+  "context": {
+   "ui_stage": "analyzing"
+  },
+  "output": "<hs_7>(topic=4, delivery=1)<hs_end>"
+ },
+ {
+  "function": "handle_scope_limit",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "현재 화면을 열어 두었어요 감자의 병을 현재 모델로 화긴하고 싶어요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.97,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "무 검은무늬병",
+     "confidence": 0.97
+    },
+    {
+     "name": "무 정상",
+     "confidence": 0.02
+    }
+   ]
+  },
+  "output": "<hs_6>(reason=1)<hs_end>"
+ },
+ {
+  "function": "handle_scope_limit",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": false,
+  "user_text": "화면을 보고 질문할게 고추가 아니라 상추인데 나온 병명을 그대로 쓰나요",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.44,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "무 검은무늬병",
+     "confidence": 0.44
+    },
+    {
+     "name": "무 정상",
+     "confidence": 0.41
+    }
+   ]
+  },
+  "output": "<hs_6>(reason=1)<hs_end>"
+ },
+ {
+  "function": "handle_scope_limit",
+  "split": "validation",
+  "augmentation": "banmal",
+  "stt": false,
+  "user_text": "화면을 보고 질문할게 현재 지원 밖인 콩도 진단해줄래",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "무",
+   "predicted_crop": "무",
+   "disease_name": "무 검은무늬병",
+   "category": "disease",
+   "confidence": 0.56,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "무 검은무늬병",
+     "confidence": 0.56
+    },
+    {
+     "name": "무 정상",
+     "confidence": 0.41
+    }
+   ]
+  },
+  "output": "<hs_6>(reason=1)<hs_end>"
+ },
+ {
+  "function": "handle_scope_limit",
+  "split": "validation",
+  "augmentation": "dialect_chungcheong",
+  "stt": false,
+  "user_text": "지금 내용을 화긴 중이에유 지금 입력은 식물이 아니라 식물이 없는 흙바닥인 걸 알아주세유",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 노균병",
+   "category": "disease",
+   "confidence": 0.72,
+   "severity": "medium",
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 노균병",
+     "confidence": 0.72
+    },
+    {
+     "name": "배추 정상",
+     "confidence": 0.27
+    }
+   ]
+  },
+  "output": "<hs_6>(reason=3)<hs_end>"
+ },
+ {
+  "function": "handle_scope_limit",
+  "split": "validation",
+  "augmentation": "original",
+  "stt": true,
+  "user_text": "물을 자동으로 주고 기로또 저장해주세여",
+  "context": {
+   "ui_stage": "result",
+   "selected_crop": "배추",
+   "predicted_crop": "배추",
+   "disease_name": "배추 정상",
+   "category": "normal",
+   "confidence": 0.88,
+   "crop_mismatch": false,
+   "prediction_mode": "model",
+   "top_predictions": [
+    {
+     "name": "배추 정상",
+     "confidence": 0.88
+    }
+   ]
+  },
+  "output": "<hs_6>(reason=2)<hs_end>"
+ }
+]
