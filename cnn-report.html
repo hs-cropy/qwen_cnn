@@ -1,0 +1,626 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cropy CNN 연구 보고서</title>
+<meta name="description" content="Cropy 작물 병해 진단 CNN(ResNet50) 연구 과정, 데이터셋 상태, 라벨 문제, 단계별 성과와 성능 지표 정리">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+:root{
+  --bg:#f7f7f8; --surface:#ffffff; --text:#191919; --text2:#5f6368; --muted:#8a8f98; --line:#ececef;
+  --green:#2e8b57; --green-d:#1f633d; --green-50:#edf7f1; --amber:#b7791f; --amber-50:#fdf6e7;
+  --red:#d92d20; --red-50:#fff1f0; --blue:#2f6fe0; --blue-50:#eef3fd;
+  --radius:16px; --shadow:0 1px 2px rgba(0,0,0,.04),0 4px 16px rgba(0,0,0,.04);
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#111312; --surface:#1a1d1b; --text:#ecefed; --text2:#b4bab6; --muted:#8b928d; --line:#2a2f2c;
+    --green:#4fbf82; --green-d:#7fd6a5; --green-50:#18291f; --amber:#e0a84a; --amber-50:#2a2414;
+    --red:#ff7a6e; --red-50:#2c1816; --blue:#7aa7ff; --blue-50:#172036; --shadow:none; }
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:72px}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Pretendard,-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Noto Sans KR",sans-serif;line-height:1.7;font-size:16px;word-break:keep-all;-webkit-font-smoothing:antialiased}
+a{color:var(--green)}
+code{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-size:.86em;background:var(--green-50);padding:.1em .4em;border-radius:6px;word-break:break-all}
+.nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{max-width:1080px;margin:0 auto;padding:12px 20px;display:flex;gap:16px;align-items:center}
+.brand{font-weight:800;color:var(--green);white-space:nowrap}
+.nav-links{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
+.nav-links::-webkit-scrollbar{display:none}
+.nav-links a{color:var(--text2);text-decoration:none;font-size:14px;padding:6px 10px;border-radius:999px;white-space:nowrap}
+.nav-links a:hover{background:var(--green-50);color:var(--green)}
+main{max-width:1080px;margin:0 auto;padding:0 20px 80px}
+header.hero{padding:56px 0 24px}
+.eyebrow{display:inline-block;font-size:13px;font-weight:700;color:var(--green);background:var(--green-50);padding:4px 12px;border-radius:999px}
+h1{font-size:clamp(28px,4.4vw,42px);line-height:1.25;margin:16px 0 12px;letter-spacing:-.02em}
+.lead{font-size:18px;color:var(--text2);max-width:780px;margin:0}
+.meta{margin-top:16px;font-size:14px;color:var(--muted)}
+section{margin-top:56px}
+h2{font-size:26px;letter-spacing:-.01em;margin:0 0 6px}
+h2 .num{color:var(--green);margin-right:8px}
+.sub{color:var(--text2);margin:0 0 20px}
+h3{font-size:19px;margin:28px 0 10px}
+p{margin:0 0 12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);padding:24px}
+.grid{display:grid;gap:16px}
+.g4{grid-template-columns:repeat(4,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g2{grid-template-columns:repeat(2,1fr)}
+@media (max-width:860px){.g4{grid-template-columns:repeat(2,1fr)}.g3,.g2{grid-template-columns:1fr}}
+@media (max-width:480px){.g4{grid-template-columns:1fr}}
+.kpi .label{font-size:13px;color:var(--text2);font-weight:600}
+.kpi .value{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:4px 0}
+.kpi .value small{font-size:16px;font-weight:700;color:var(--text2)}
+.kpi .note{font-size:13px;color:var(--muted);line-height:1.5}
+.kpi.good .value{color:var(--green)} .kpi.warn .value{color:var(--amber)} .kpi.bad .value{color:var(--red)}
+.callout{border-radius:12px;padding:16px 18px;margin:16px 0;font-size:15px}
+.callout > b:first-child{display:block;margin-bottom:4px}
+.callout.info{background:var(--blue-50);border-left:4px solid var(--blue)}
+.callout.warn{background:var(--amber-50);border-left:4px solid var(--amber)}
+.callout.ok{background:var(--green-50);border-left:4px solid var(--green)}
+.callout.bad{background:var(--red-50);border-left:4px solid var(--red)}
+.table-wrap{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface);margin:12px 0 8px}
+table{border-collapse:collapse;width:100%;font-size:14.5px;min-width:560px}
+th,td{padding:10px 14px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--bg);font-weight:700;color:var(--text2);font-size:13px;white-space:nowrap}
+tr:last-child td{border-bottom:none}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+tr.hl td{background:var(--green-50);font-weight:600}
+.caption{font-size:13px;color:var(--muted);margin:4px 2px 0}
+.tag{display:inline-block;font-size:12px;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.tag.ok{background:var(--green-50);color:var(--green)} .tag.no{background:var(--red-50);color:var(--red)}
+.tag.hold{background:var(--amber-50);color:var(--amber)} .tag.info{background:var(--blue-50);color:var(--blue)}
+/* timeline */
+.tl{position:relative;margin:8px 0 0;padding-left:28px}
+.tl::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--line)}
+.tl-item{position:relative;margin-bottom:18px}
+.tl-item::before{content:"";position:absolute;left:-25px;top:22px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--green)}
+.tl-item .card{padding:18px 20px}
+.tl-date{font-size:13px;font-weight:700;color:var(--green)}
+.tl-title{font-size:17px;font-weight:800;margin:2px 0 6px}
+.tl-item ul{margin:6px 0 0;padding-left:18px;color:var(--text2);font-size:15px}
+.tl-item li{margin:2px 0}
+.result{margin-top:10px;font-size:14px;font-weight:600}
+/* bars */
+.bars{display:flex;flex-direction:column;gap:10px;margin:12px 0}
+.bar-row{display:grid;grid-template-columns:minmax(120px,210px) 1fr 64px;gap:12px;align-items:center;font-size:14px}
+.bar-row .name{color:var(--text2)}
+.bar-track{height:14px;background:var(--line);border-radius:999px;overflow:hidden;position:relative}
+.bar-fill{height:100%;border-radius:999px;background:var(--green)}
+.bar-fill.alt{background:#9cc9ad} .bar-fill.warn{background:var(--amber)} .bar-fill.bad{background:var(--red)}
+.bar-row .v{text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+@media (max-width:560px){.bar-row{grid-template-columns:1fr 56px}.bar-row .name{grid-column:1/-1}}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:13px;color:var(--text2);margin-top:6px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+.pair{display:grid;grid-template-columns:minmax(120px,210px) 1fr;gap:12px;align-items:center;font-size:14px;margin:6px 0}
+.pair .stack{display:flex;flex-direction:column;gap:4px}
+.mini{display:grid;grid-template-columns:1fr 56px;gap:8px;align-items:center}
+.mini .v{font-size:13px;text-align:right;font-weight:700;font-variant-numeric:tabular-nums}
+.toc{columns:2;column-gap:32px;margin:0;padding-left:20px;color:var(--text2)}
+.toc li{margin:4px 0}
+@media (max-width:640px){.toc{columns:1}}
+ul.clean{padding-left:20px;margin:8px 0}
+ul.clean li{margin:4px 0}
+footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
+</style>
+</head>
+<body>
+
+<nav class="nav"><div class="nav-in">
+  <span class="brand">Cropy CNN</span>
+  <div class="nav-links">
+    <a href="#summary">요약</a><a href="#model">모델</a><a href="#timeline">연구 과정</a><a href="#dataset">데이터셋</a>
+    <a href="#labels">라벨 문제</a><a href="#experiments">실험</a><a href="#metrics">성능 지표</a><a href="#next">결론·다음 단계</a>
+  </div>
+</div></nav>
+
+<main>
+<header class="hero">
+  <span class="eyebrow">크래파스 · Cropy 작물 병해 진단</span>
+  <h1>CNN 병해 진단 모델 연구 보고서</h1>
+  <p class="lead">고추·무·배추의 병해 6종과 정상 3종, 판별 불가 사진까지 10개 클래스로 분류하는 ResNet50 모델을 2026년 7월부터 11월까지 어떻게 만들고, 어떤 문제를 찾았고, 무엇이 실제로 성능을 바꿨는지 정리했습니다.</p>
+  <p class="meta">최종 갱신 2026-11-05 · 담당 김헌영(PM·모델) · 학습 환경 Google Colab(T4) + Google Drive · 원 기록: Cropy 저장소 <code>docs/MODEL_SPEC.md</code>, <code>ml/README.md</code>, <code>ml/worker_split_v1/</code></p>
+</header>
+
+<!-- 1. 요약 -->
+<section id="summary">
+  <h2><span class="num">01</span>한눈에 보기</h2>
+  <p class="sub">숫자는 평가 기준(어떤 사진으로 쟀는지)이 다르면 서로 비교할 수 없습니다. 카드마다 기준을 적었습니다.</p>
+  <div class="grid g4">
+    <div class="card kpi good"><div class="label">현재 교체 후보 모델</div><div class="value">448<small>px</small></div><div class="note">ResNet50 · 10클래스<br>공식 val 99.68% / Macro F1 0.962</div></div>
+    <div class="card kpi good"><div class="label">작업자 분리 시험셋 Macro F1</div><div class="value">0.917</div><div class="note">기준선 0.899 → 448px 0.917<br>새 촬영자 11,434장 기준</div></div>
+    <div class="card kpi good"><div class="label">무노균병 재현율</div><div class="value">88.5<small>%</small></div><div class="note">기준선 74.4% → +14.1%p<br>(작업자 분리 시험셋)</div></div>
+    <div class="card kpi bad"><div class="label">무검은무늬병 재현율</div><div class="value">54.2<small>%</small></div><div class="note">7가지 개선 시도에도 그대로<br>라벨 품질에 묶인 상한</div></div>
+  </div>
+  <div class="callout info">
+    <b>핵심 결론</b>
+    같은 작업자의 사진으로 잰 검증 정확도(99%대)는 새 사용자 성능을 말해 주지 않아, 촬영 작업자 78명을 통째로 나눈 <b>작업자 분리 시험셋</b>을 만들어 판정 기준으로 삼았습니다. 그 위에서 백본·해상도·2단계 분류기·병반 crop·라벨 정리 등 7가지를 시험했고, <b>입력 해상도 448px만 효과</b>가 있었습니다. 남은 약점인 무 두 질병의 혼동은 모델이 아니라 <b>AI Hub 라벨 품질과 데이터 규모</b> 문제로 결론 내렸고, 제품에서는 무 질병이 1순위로 나오면 잎 뒷면을 다시 찍게 하는 방식으로 대응합니다.
+  </div>
+  <div class="card" style="margin-top:16px">
+    <ol class="toc">
+      <li><a href="#model">모델 사양과 클래스 정의</a></li>
+      <li><a href="#timeline">연구 과정 (단계별 타임라인)</a></li>
+      <li><a href="#dataset">데이터셋의 상태</a></li>
+      <li><a href="#labels">라벨·데이터 품질 문제</a></li>
+      <li><a href="#experiments">작업자 분리 시험셋 실험 1~7</a></li>
+      <li><a href="#metrics">단계별 성과와 성능 개선 지표</a></li>
+      <li><a href="#product">제품 쪽 대응 (유도촬영)</a></li>
+      <li><a href="#next">결론과 다음 단계</a></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 2. 모델 -->
+<section id="model">
+  <h2><span class="num">02</span>모델 사양과 클래스 정의</h2>
+  <p class="sub">ImageNet 사전학습 ResNet50을 미세조정한 이미지 분류기입니다. 진단 결과는 백엔드 DB의 병해 정보와 <code>model_class_id</code>로 연결됩니다.</p>
+  <div class="grid g2">
+    <div class="table-wrap" style="margin:0"><table>
+      <tr><th>항목</th><th>값</th></tr>
+      <tr><td>아키텍처</td><td>ResNet50 (ImageNet 초기화 후 미세조정)</td></tr>
+      <tr><td>입력</td><td>RGB, 256px(서버 운영) → 448px(교체 후보), ImageNet 정규화</td></tr>
+      <tr><td>출력</td><td>10클래스 softmax, 상위 3개 + 전체 분포 반환</td></tr>
+      <tr><td>학습 설정</td><td>AdamW(wd 1e-4), cosine LR, label smoothing 0.1, 클래스 균형 샘플링, 흐림 증강, 검증 Macro F1로 모델 선택</td></tr>
+      <tr><td>증강</td><td>RandomResizedCrop(0.7~1.0), 좌우반전, 회전 ±15°, ColorJitter, 가우시안 흐림</td></tr>
+      <tr><td>추론 속도 (CPU, 배치 1)</td><td>256px 78ms → 448px 185ms</td></tr>
+      <tr><td>배포 형태</td><td>서버(PyTorch), 브라우저 오프라인(ONNX Runtime Web) · 보드용 RKNN 변환은 미검증</td></tr>
+    </table></div>
+    <div class="table-wrap" style="margin:0"><table>
+      <tr><th class="n">id</th><th>클래스</th><th>작물</th><th>종류</th></tr>
+      <tr><td class="n">0</td><td>고추탄저병</td><td>고추</td><td>병해</td></tr>
+      <tr><td class="n">1</td><td>고추흰가루병</td><td>고추</td><td>병해</td></tr>
+      <tr><td class="n">2</td><td><b>무검은무늬병</b></td><td>무</td><td>병해</td></tr>
+      <tr><td class="n">3</td><td><b>무노균병</b></td><td>무</td><td>병해</td></tr>
+      <tr><td class="n">4</td><td>배추검은썩음병</td><td>배추</td><td>병해</td></tr>
+      <tr><td class="n">5</td><td>배추노균병</td><td>배추</td><td>병해</td></tr>
+      <tr><td class="n">6~8</td><td>고추·무·배추 정상</td><td>각 작물</td><td>정상</td></tr>
+      <tr><td class="n">9</td><td>기타 (판별 불가)</td><td>—</td><td>2026-10 추가</td></tr>
+    </table></div>
+  </div>
+  <p class="caption">폴더명 앞 숫자가 곧 <code>model_class_id</code>라서, 클래스를 추가해도 기존 ID가 밀리지 않습니다.</p>
+</section>
+
+<!-- 3. 타임라인 -->
+<section id="timeline">
+  <h2><span class="num">03</span>연구 과정</h2>
+  <p class="sub">MVP → 데이터 확장 → 데이터 신뢰성 점검 → 전체 데이터 학습 → 판별 불가 클래스 → 작업자 분리 시험셋과 개선 실험 → 라벨 재검토 순으로 진행했습니다.</p>
+
+  <div class="tl">
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">1단계 · 2026-07-02 ~ 07-04</div>
+      <div class="tl-title">MVP 모델과 데이터 확장</div>
+      <ul>
+        <li>AI Hub「노지 작물 질병 진단」(dataSetSn 147) Validation 원천 데이터로 시작: 병해 6종 → 정상 3종을 더해 9클래스.</li>
+        <li>초기 데이터 476장(train 404 / val 72)으로 시작. ResNet18 모델은 val 94.4%에서 정규화만으로는 더 오르지 않음(train 정확도 100% 포화) → 데이터 확충이 우선이라고 판단.</li>
+        <li>Training 분할 질병 데이터를 추가해 4,246장(train 2,972 / val 637 / test 637)으로 재구성, Colab T4에서 ResNet50 학습.</li>
+      </ul>
+      <div class="result">결과: val 96.2% / test 93.1%. 같은 test에서 이전 모델 91.2%. 무노균병 10.5% → 71.1%.</div>
+    </div></div>
+
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">2단계 · 2026-07-07</div>
+      <div class="tl-title">무 질병 혼동 분석과 미세조정 기반</div>
+      <ul>
+        <li>test 오분류 44건 중 26건(59.1%)이 무검은무늬병 ↔ 무노균병 상호 혼동. 나머지 7개 클래스는 94~100%.</li>
+        <li>TTA(좌우반전 평균) 93.1 → 93.2%로 무의미 → 추론 변동이 아니라 분리력 문제로 판단.</li>
+        <li>클래스 균형 샘플러, 해상도 옵션, 체크포인트 <code>img_size</code> 저장, 혼동쌍 유도촬영 설계(잎 뒷면 재촬영) 착수.</li>
+      </ul>
+    </div></div>
+
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">3단계 · 2026-09-17 ~ 09-18</div>
+      <div class="tl-title">3주차 Colab 재현과 이어학습</div>
+      <ul>
+        <li>축소 번들 val 637장 재평가 96.23%(613/637). 원본 이미지로는 94.66% — 원본 사용이 개선으로 이어지지 않음.</li>
+        <li>같은 시작 모델에서 일반·균형 샘플링 이어학습 각 12 epoch → 둘 다 기준 모델을 넘지 못해 기존 모델 유지.</li>
+      </ul>
+    </div></div>
+
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">4단계 · 2026-09-18 ~ 09-24</div>
+      <div class="tl-title">데이터 신뢰성 점검과 작업자 분리 첫 기준선</div>
+      <ul>
+        <li>분할 독립성 점검: train↔val 2쌍, train↔test 4쌍이 동일 이미지(SHA256 일치) → 기존 93.1%는 완전한 일반화 성능이 아님.</li>
+        <li>AI Hub 공식 문서·라벨 JSON 91,041개 확인: 파일명의 날짜 앞 코드가 <b>수집 작업자 ID</b>임을 확인.</li>
+        <li>작업자 단위 분할(4,235장)로 ImageNet 초기화부터 새로 학습: val 91.85% / Macro F1 0.9035, 256 입력 92.48%.</li>
+        <li>주요 오류 사진 42장 육안 검토 — 라벨 코드는 일치, 라벨 치수 0/0 6건 발견.</li>
+      </ul>
+    </div></div>
+
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">5단계 · 2026-10-02 ~ 10-06</div>
+      <div class="tl-title">전체 데이터 학습 (36,583장)</div>
+      <ul>
+        <li>중복 제거·라벨 연결한 공식 Training 32,513 / Validation 4,070장, 긴 변 512px 사본으로 Colab 학습.</li>
+        <li>기준 모델 val 99.43% / F1 0.9608 → 256 미세조정 99.58% / 0.9624, 384 미세조정 99.56% / 0.9600.</li>
+        <li>그러나 무노균병 재현율 79.2% → 70.8%(256) → 62.5%(384)로 하락 → 서비스 교체 보류. 학습 crop 제거 실험도 효과 없음.</li>
+      </ul>
+      <div class="result">교훈: 전체 지표 상승 ≠ 목표 질병 개선. 정상이 검증셋의 88%라 전체 정확도는 거의 항상 높게 나옴.</div>
+    </div></div>
+
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">6단계 · 2026-10-26 ~ 10-27</div>
+      <div class="tl-title">판별 불가(9_기타) 클래스 추가 → 10클래스</div>
+      <ul>
+        <li>손·물건 사진도 9개 중 하나로 진단되는 문제 해결을 위해 AI Hub 잎 바깥 조각 + COCO 2017 val 5,000장으로 기타 클래스 구성.</li>
+        <li>val 99.57% / Macro F1 0.958, 작물 사진 → 기타 1/4,070, 기타 재현율 563/565.</li>
+        <li>흐림 평가(가우시안 σ2): 작물 → 기타 0.34%(채택 기준 2% 통과). 같은 조건 9클래스 모델 정확도 77.8% vs 새 모델 98.8%.</li>
+      </ul>
+      <div class="result"><span class="tag ok">채택</span> PR #107로 백엔드·오프라인·프론트 10클래스 전환.</div>
+    </div></div>
+
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">7단계 · 2026-10-28 ~ 11-02</div>
+      <div class="tl-title">작업자 분리 시험셋과 개선 실험 1~6</div>
+      <ul>
+        <li>공식 Validation 4,070장 중 4,063장이 Training과 같은 작업자·날짜 → val 99.6%는 새 촬영자 성능이 아님.</li>
+        <li>작업자 78명을 통째로 train/val/test에 배정(seed 1568), 시험 11,434장. 기준선 Macro F1 0.899.</li>
+        <li>ConvNeXt, 448px, 무 전용 2단계 분류기, 병반 박스 crop, 원본 해상도 crop, seed 반복을 차례로 시험(→ <a href="#experiments">실험</a>).</li>
+      </ul>
+      <div class="result"><span class="tag ok">채택</span> 448px 입력만 유효 → 전체 데이터 448px 재학습본 교체 인계.</div>
+    </div></div>
+
+    <div class="tl-item"><div class="card">
+      <div class="tl-date">8단계 · 2026-11-02 ~ 11-04</div>
+      <div class="tl-title">라벨 재검토와 제품 대응</div>
+      <ul>
+        <li>무 질병 시험 290장 + 학습·검증 499장을 원본 해상도로 육안 양상 분류 → 검은무늬병 라벨의 절반 이상이 사진에 근거 없음.</li>
+        <li>라벨·양상 불일치 153장을 뺀 정리본 재학습(seed 3 vs 3) → 경계만 이동, 기각.</li>
+        <li>제품: 무 질병이 1순위면 확률 차이와 관계없이 잎 뒷면 재촬영 안내(decision-v3, PR #131).</li>
+      </ul>
+    </div></div>
+  </div>
+</section>
+
+<!-- 4. 데이터셋 -->
+<section id="dataset">
+  <h2><span class="num">04</span>데이터셋의 상태</h2>
+  <p class="sub">출처는 모두 AI Hub「노지 작물 질병 진단」(147)이며, 판별 불가 클래스에만 COCO 2017을 추가했습니다.</p>
+
+  <h3>데이터셋 버전</h3>
+  <div class="table-wrap"><table>
+    <tr><th>버전</th><th>시기</th><th class="n">train</th><th class="n">val</th><th class="n">test</th><th>분할 방식</th><th>비고</th></tr>
+    <tr><td>MVP</td><td>07-02</td><td class="n">404</td><td class="n">72</td><td class="n">—</td><td>파일 단위 무작위</td><td>Validation 원천 질병 zip만</td></tr>
+    <tr><td>확장 v1</td><td>07-04</td><td class="n">2,972</td><td class="n">637</td><td class="n">637</td><td>파일 단위 무작위</td><td>클래스당 상한 350, 무노균병 175 · 분할 간 중복 6쌍</td></tr>
+    <tr><td>작업자 분할 후보</td><td>09-21</td><td class="n">2,739</td><td class="n">785</td><td class="n">722</td><td>작업자 단위</td><td>동일 해시 분할 간 0건</td></tr>
+    <tr><td>전체 데이터 (9클래스)</td><td>10-02</td><td class="n">32,513</td><td class="n">4,070</td><td class="n">—</td><td>AI Hub 공식 분할</td><td>중복 제거, 긴 변 512px 사본</td></tr>
+    <tr><td>전체 데이터 (10클래스)</td><td>10-26</td><td class="n">37,753</td><td class="n">4,635</td><td class="n">—</td><td>AI Hub 공식 분할</td><td>9_기타 추가</td></tr>
+    <tr class="hl"><td>작업자 분리 시험셋 v1</td><td>10-28</td><td class="n">20,745 + 기타</td><td class="n">5,724 + 기타</td><td class="n">11,434</td><td>작업자 78명 통째 배정</td><td>현재 판정 기준</td></tr>
+  </table></div>
+  <p class="caption">작업자 분리 시험셋의 train/val은 아래 표 9클래스의 합에 9_기타 조각이 더해집니다. 시험 11,434장은 9_기타를 포함한 평가 수입니다.</p>
+
+  <h3>전체 데이터 클래스 분포 (공식 분할, 9클래스)</h3>
+  <div class="grid g2">
+    <div class="table-wrap" style="margin:0"><table>
+      <tr><th>클래스</th><th class="n">train</th><th class="n">val</th></tr>
+      <tr><td>고추탄저병</td><td class="n">967</td><td class="n">117</td></tr>
+      <tr><td>고추흰가루병</td><td class="n">912</td><td class="n">112</td></tr>
+      <tr><td>무검은무늬병</td><td class="n">462</td><td class="n">76</td></tr>
+      <tr><td><b>무노균병</b></td><td class="n"><b>227</b></td><td class="n"><b>24</b></td></tr>
+      <tr><td>배추검은썩음병</td><td class="n">801</td><td class="n">110</td></tr>
+      <tr><td>배추노균병</td><td class="n">456</td><td class="n">37</td></tr>
+      <tr><td>고추정상</td><td class="n">8,575</td><td class="n">1,110</td></tr>
+      <tr><td>무정상</td><td class="n">10,797</td><td class="n">1,301</td></tr>
+      <tr><td>배추정상</td><td class="n">9,316</td><td class="n">1,183</td></tr>
+      <tr class="hl"><td>합계</td><td class="n">32,513</td><td class="n">4,070</td></tr>
+    </table></div>
+    <div class="card">
+      <b>질병 사진은 전체의 12%뿐</b>
+      <div class="bars">
+        <div class="bar-row"><span class="name">정상 3종</span><div class="bar-track"><div class="bar-fill alt" style="width:88.3%"></div></div><span class="v">88.3%</span></div>
+        <div class="bar-row"><span class="name">질병 6종</span><div class="bar-track"><div class="bar-fill" style="width:11.7%"></div></div><span class="v">11.7%</span></div>
+      </div>
+      <b>질병별 학습 사진 수</b>
+      <div class="bars">
+        <div class="bar-row"><span class="name">고추탄저병</span><div class="bar-track"><div class="bar-fill" style="width:100%"></div></div><span class="v">967</span></div>
+        <div class="bar-row"><span class="name">고추흰가루병</span><div class="bar-track"><div class="bar-fill" style="width:94.3%"></div></div><span class="v">912</span></div>
+        <div class="bar-row"><span class="name">배추검은썩음병</span><div class="bar-track"><div class="bar-fill" style="width:82.8%"></div></div><span class="v">801</span></div>
+        <div class="bar-row"><span class="name">무검은무늬병</span><div class="bar-track"><div class="bar-fill warn" style="width:47.8%"></div></div><span class="v">462</span></div>
+        <div class="bar-row"><span class="name">배추노균병</span><div class="bar-track"><div class="bar-fill" style="width:47.2%"></div></div><span class="v">456</span></div>
+        <div class="bar-row"><span class="name">무노균병</span><div class="bar-track"><div class="bar-fill bad" style="width:23.5%"></div></div><span class="v">227</span></div>
+      </div>
+      <p class="caption">그래서 전체 정확도 대신 Macro F1과 질병별 재현율로 판정합니다.</p>
+    </div>
+  </div>
+
+  <h3>작업자 분리 시험셋 v1 (현재 판정 기준)</h3>
+  <div class="table-wrap"><table>
+    <tr><th>클래스</th><th class="n">train</th><th class="n">val</th><th class="n">test</th><th>시험 작업자</th></tr>
+    <tr><td>0 고추탄저병</td><td class="n">589</td><td class="n">134</td><td class="n">361</td><td>1553bb, 9315z</td></tr>
+    <tr><td>1 고추흰가루병</td><td class="n">528</td><td class="n">166</td><td class="n">330</td><td>1553bb, 9315z</td></tr>
+    <tr><td>2 무검은무늬병</td><td class="n">267</td><td class="n">59</td><td class="n">212</td><td>2852e, 5389e</td></tr>
+    <tr><td>3 무노균병</td><td class="n">124</td><td class="n">49</td><td class="n">78</td><td>2852e, 5389e</td></tr>
+    <tr><td>4 배추검은썩음병</td><td class="n">574</td><td class="n">107</td><td class="n">230</td><td>5978e, 7086bb</td></tr>
+    <tr><td>5 배추노균병</td><td class="n">310</td><td class="n">58</td><td class="n">125</td><td>5978e, 7086bb</td></tr>
+    <tr><td>6~8 정상</td><td class="n">18,353</td><td class="n">5,151</td><td class="n">8,749</td><td>c14, c28, c32, c33</td></tr>
+  </table></div>
+  <p class="caption">파일명의 작업자 코드(날짜 앞 토큰)로 78명을 70/10/20에 가깝게 배정, 클래스마다 시험 작업자 2명 이상. 9_기타의 AI Hub 조각은 원본 작업자를 따르고 COCO 조각은 내용 해시로 나눴습니다.</p>
+
+  <div class="callout warn">
+    <b>이 시험셋의 한계</b>
+    <ul class="clean">
+      <li>작업자 분리는 <b>농장·지역 분리가 아닙니다.</b> 무 질병은 전부 region 9, 배추 질병은 전부 region 1입니다.</li>
+      <li>시험 작업자의 촬영 날짜가 학습 작업자와 상당수 겹칩니다(무노균병 9일 중 5일). 같은 밭을 여러 명이 찍었을 수 있습니다.</li>
+      <li>질병 사진과 정상 사진의 작업자가 전혀 겹치지 않아, 촬영 스타일로 정상/질병을 가르는 교란은 잡히지 않습니다.</li>
+      <li>무 시험 작업자는 2명뿐이라 10%p 미만의 차이는 개선으로 보지 않습니다.</li>
+      <li>여러 실험의 채택 판단에 반복 사용해 448px 점수에는 선택 편향이 섞일 수 있습니다. 최종 성능은 새로 모은 밭 사진 같은 별도 평가셋으로 확인해야 합니다.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- 5. 라벨 문제 -->
+<section id="labels">
+  <h2><span class="num">05</span>라벨·데이터 품질 문제</h2>
+  <p class="sub">성능이 오르지 않는 원인을 추적하다 발견한 데이터 쪽 문제들입니다. 가장 큰 것은 <b>무검은무늬병 라벨의 혼재</b>입니다.</p>
+
+  <div class="grid g3">
+    <div class="card"><span class="tag no">분할 오염</span><h3 style="margin-top:10px">분할 간 동일 이미지 6쌍</h3><p>확장 v1에서 train↔val 2쌍, train↔test 4쌍이 원본 SHA256까지 동일. 파일 단위 무작위 분할의 결과로, 초기 test 93.1%는 완전한 일반화 성능이 아닙니다.</p></div>
+    <div class="card"><span class="tag no">작업자 누수</span><h3 style="margin-top:10px">공식 val의 99.8%가 학습 작업자</h3><p>AI Hub 공식 Validation 4,070장 중 4,063장이 Training과 같은 작업자·날짜 묶음. 공식 분할로 잰 99%대 정확도는 새 촬영자 성능을 보여 주지 못합니다.</p></div>
+    <div class="card"><span class="tag hold">메타데이터</span><h3 style="margin-top:10px">비어 있거나 깨진 필드</h3><p>라벨의 worker 필드 전부 공란(파일명에서 복원), 원본 크기 0/0 라벨 43장(박스 사용 불가), 날짜 불일치 2건, Colab unzip 시 한글 클래스명 깨짐(복원 후 재저장).</p></div>
+  </div>
+
+  <h3>무검은무늬병 라벨의 혼재 — 육안 양상 분류</h3>
+  <p>원본 해상도(5472×3648) 병반 crop을 보고 <b>병명이 아니라 보이는 양상</b>으로 분류했습니다. 식물병리 전문가의 판정이 아니라 1차 검토이며, "라벨 의심"은 확정이 아니라 전문가 검토 우선순위입니다.</p>
+  <div class="table-wrap"><table>
+    <tr><th>양상 코드</th><th>뜻</th></tr>
+    <tr><td><b>A</b></td><td>회백색 반점 + 갈색 테두리 (노균병 양상)</td></tr>
+    <tr><td><b>B</b></td><td>갈색·검은 반점 / 동심원 (검은무늬병 양상)</td></tr>
+    <tr><td><b>Bf</b></td><td>아주 작은 검은·자주색 점 (초기 검은무늬병 양상)</td></tr>
+    <tr><td><b>C</b></td><td>황화 + 괴사 덩어리 (후기 / 혼합)</td></tr>
+    <tr><td><b>D</b></td><td>병반이 거의 보이지 않음</td></tr>
+  </table></div>
+
+  <div class="grid g2">
+    <div>
+      <h3>시험셋 290장</h3>
+      <div class="table-wrap" style="margin-top:0"><table>
+        <tr><th>AI Hub 라벨</th><th class="n">A</th><th class="n">B</th><th class="n">Bf</th><th class="n">C</th><th class="n">D</th><th class="n">E</th></tr>
+        <tr><td>무검은무늬병 (212)</td><td class="n">31</td><td class="n">43</td><td class="n">56</td><td class="n">25</td><td class="n"><b>56</b></td><td class="n">1</td></tr>
+        <tr><td>무노균병 (78)</td><td class="n"><b>67</b></td><td class="n">1</td><td class="n">1</td><td class="n">0</td><td class="n">9</td><td class="n">0</td></tr>
+      </table></div>
+    </div>
+    <div>
+      <h3>학습·검증 499장</h3>
+      <div class="table-wrap" style="margin-top:0"><table>
+        <tr><th>AI Hub 라벨</th><th class="n">A</th><th class="n">B</th><th class="n">Bf</th><th class="n">C</th><th class="n">D</th></tr>
+        <tr><td>무검은무늬병 (326)</td><td class="n">17</td><td class="n">131</td><td class="n">82</td><td class="n">16</td><td class="n"><b>80</b></td></tr>
+        <tr><td>무노균병 (173)</td><td class="n"><b>133</b></td><td class="n">13</td><td class="n">8</td><td class="n">3</td><td class="n">16</td></tr>
+      </table></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:12px">
+    <b>시험셋 무검은무늬병 212장의 실제 양상</b>
+    <div class="bars">
+      <div class="bar-row"><span class="name">검은무늬 양상 (B·Bf)</span><div class="bar-track"><div class="bar-fill" style="width:46.7%"></div></div><span class="v">47%</span></div>
+      <div class="bar-row"><span class="name">병반 안 보임 (D)</span><div class="bar-track"><div class="bar-fill bad" style="width:26.4%"></div></div><span class="v">26%</span></div>
+      <div class="bar-row"><span class="name">노균 양상 (A)</span><div class="bar-track"><div class="bar-fill warn" style="width:14.6%"></div></div><span class="v">15%</span></div>
+      <div class="bar-row"><span class="name">후기·혼합 (C)</span><div class="bar-track"><div class="bar-fill warn" style="width:11.8%"></div></div><span class="v">12%</span></div>
+    </div>
+    <p class="caption">노균병 라벨은 78장 중 67장이 A로 일관되지만, 검은무늬병 라벨은 절반 이상이 "검은무늬병이라고 볼 근거가 사진에 없는" 사진입니다.</p>
+  </div>
+
+  <div class="callout bad">
+    <b>육안으로 확인한 사실</b>
+    노균병으로 잘못 간 검은무늬병 사진과, 정답으로 맞힌 노균병 사진이 <b>겉보기에 같습니다</b>(옅은 회백색 반점 + 갈색 테두리). 512px 묶음에서는 반점이 10px 안팎이라 동심원 같은 세부 구조도 보이지 않습니다. 즉 이 데이터에서 무 두 질병의 혼동은 (1) 작업자·시기에 따라 흔들린 라벨, 또는 한 잎에 두 병이 섞인 사례와 (2) 판별 세부가 사라지는 해상도가 겹친 결과입니다.
+  </div>
+
+  <h3>모델 오류가 어디서 나오는가 (448px 모델, 시험셋 무 질병)</h3>
+  <div class="bars card">
+    <div class="bar-row"><span class="name">라벨·양상 일치 166장</span><div class="bar-track"><div class="bar-fill" style="width:78%"></div></div><span class="v">78%</span></div>
+    <div class="bar-row"><span class="name">병반 안 보임</span><div class="bar-track"><div class="bar-fill warn" style="width:54%"></div></div><span class="v">54%</span></div>
+    <div class="bar-row"><span class="name">검은무늬 라벨 + 노균 양상</span><div class="bar-track"><div class="bar-fill bad" style="width:52%"></div></div><span class="v">52%</span></div>
+    <div class="bar-row"><span class="name">황화·괴사 (후기)</span><div class="bar-track"><div class="bar-fill bad" style="width:44%"></div></div><span class="v">44%</span></div>
+  </div>
+  <p class="caption">오류의 큰 몫은 사진에 근거가 없는 라벨에서 나옵니다. 다만 뚜렷한 검은무늬병 반점(B) 43장도 60%만 맞혀, 라벨을 정리해도 검은무늬병 70% 안팎이 현재 모델의 상한으로 보입니다.</p>
+
+  <h3>그 밖의 데이터 편향</h3>
+  <ul class="clean">
+    <li><b>시기 편향</b>: 무검은무늬병 오답은 11월 10일 이후 촬영분(85장 중 57장 오답)과 피해 정도 2·3에 몰려 있습니다. 학습 데이터의 무검은무늬병은 피해 정도 2가 6장, 3이 0장뿐이고, 시험셋 무노균병은 전부 11월 10일 이전이라 모델이 늦가을 잎 상태를 노균병 단서로 쓰고 있을 가능성이 큽니다.</li>
+    <li><b>작업자 편향</b>: 고추탄저병 오답 19장 중 16장이 고추정상이고 그중 13장이 작업자 9315z. 피해가 심한 사진에서도 놓쳐 초기 병반이 아니라 촬영 방식 문제로 보입니다.</li>
+    <li><b>규모 한계</b>: AI Hub 147의 질병 원본은 이미 전부 확보했고(공식 수량은 증강본 포함), 국내 밭의 무·배추·고추 병해 공개 데이터는 달리 없습니다.</li>
+  </ul>
+</section>
+
+<!-- 6. 실험 -->
+<section id="experiments">
+  <h2><span class="num">06</span>작업자 분리 시험셋 실험</h2>
+  <p class="sub">모든 실험은 같은 분할·같은 기본 설정(ResNet50, 흐림 증강, 클래스 균형)에서 한 가지만 바꿨습니다. 무 클래스는 시험 작업자가 2명뿐이라 <b>10%p 이상 움직여야 개선</b>으로 봤습니다.</p>
+
+  <div class="table-wrap"><table>
+    <tr><th>#</th><th>실험</th><th>바꾼 것</th><th class="n">Macro F1</th><th class="n">무검은무늬병</th><th class="n">무노균병</th><th>판정</th></tr>
+    <tr><td>0</td><td>기준선</td><td>256px, 8 epoch</td><td class="n">0.899</td><td class="n">53.8%</td><td class="n">74.4%</td><td><span class="tag info">기준</span></td></tr>
+    <tr><td>1</td><td>ConvNeXt-Tiny</td><td>백본 교체</td><td class="n">0.905</td><td class="n">52.4%</td><td class="n">80.8%</td><td><span class="tag no">기각</span></td></tr>
+    <tr class="hl"><td>2</td><td>고해상도 입력</td><td>256 → 448px</td><td class="n">0.917</td><td class="n">54.2%</td><td class="n">88.5%</td><td><span class="tag ok">채택</span></td></tr>
+    <tr><td>3</td><td>무 전용 2단계 분류기</td><td>무 쌍 전용 모델</td><td class="n">—</td><td class="n">59.9%</td><td class="n">82.1%</td><td><span class="tag no">기각</span></td></tr>
+    <tr><td>4</td><td>병반 박스 crop</td><td>배경 제거</td><td class="n">—</td><td class="n">65.6%</td><td class="n">69.2%</td><td><span class="tag no">기각</span></td></tr>
+    <tr><td>5</td><td>원본 해상도 crop</td><td>5472px 원본에서 crop</td><td class="n">—</td><td class="n">65.6%</td><td class="n">83.3%</td><td><span class="tag hold">재현 필요</span></td></tr>
+    <tr><td>6</td><td>실험 5 seed 3회</td><td>seed 반복</td><td class="n">—</td><td class="n">39.6~75.0%</td><td class="n">—</td><td><span class="tag no">재현 실패</span></td></tr>
+    <tr><td>7</td><td>라벨 정리본</td><td>불일치 153장 제외</td><td class="n">0.9225</td><td class="n">+11.8%p*</td><td class="n">−9.0%p*</td><td><span class="tag no">기각</span></td></tr>
+  </table></div>
+  <p class="caption">실험 3~6은 시험셋 무 질병 290장에서 잰 해당 실험 모델의 재현율입니다(실험 3은 전용 분류기 단독, 4는 crop 학습→crop 평가, 5는 hi448). *실험 7은 라벨·양상 일치 166장에서 대조군 대비 변화량(seed 3회 평균).</p>
+
+  <div class="grid g2" style="margin-top:16px">
+    <div class="card">
+      <span class="tag no">기각</span>
+      <h3 style="margin-top:8px">1. ConvNeXt-Tiny</h3>
+      <p>Macro F1 +0.006, 무노균병 +6.4%p로 기준 미달. 무검은무늬병 → 무노균병 오류는 77 → 83장으로 오히려 늘었습니다. 혼동은 백본 용량 문제가 아닙니다.</p>
+    </div>
+    <div class="card">
+      <span class="tag ok">채택</span>
+      <h3 style="margin-top:8px">2. 입력 448px</h3>
+      <p>원본이 512px이라 448은 병반 질감을 거의 그대로 씁니다. 무노균병 +14.1%p(노균 → 검은무늬 오류 16 → 8장), 나빠진 클래스 없음. 무검은무늬병은 그대로(85장이 여전히 노균병으로). 추론 연산은 약 3배.</p>
+    </div>
+    <div class="card">
+      <span class="tag no">기각</span>
+      <h3 style="margin-top:8px">3. 무 전용 2단계 분류기</h3>
+      <p>전용 단독 65.9% vs 본 모델 63.4%(McNemar p=0.47, 차이 없음), 재분배 규칙으로 합치면 60.0%로 악화. 전용 모델은 심한 검은무늬병을, 본 모델은 가벼운 검은무늬병·노균병을 맞혀 서로 다른 사진을 맞히지만 합산 규칙이 장점을 못 살립니다. <code>ENABLE_PAIR_MODEL=false</code> 유지.</p>
+    </div>
+    <div class="card">
+      <span class="tag no">기각</span>
+      <h3 style="margin-top:8px">4. 병반 박스 crop</h3>
+      <p>가설: "모델이 병반이 아니라 배경·계절 단서로 판정한다." 병반만 보고 학습·평가해도 균형 정확도 67.4%로 기존(71.4%)보다 낮아, 배경을 치워도 혼동은 그대로입니다. 배경 단서 가설 기각.</p>
+    </div>
+    <div class="card">
+      <span class="tag hold">→ 실험 6에서 기각</span>
+      <h3 style="margin-top:8px">5. 원본 해상도 crop</h3>
+      <p>원본 crop(긴 변 1024) 학습이 512 묶음 crop보다 정확도 54.5 → 70.3%, 무검은무늬병 43.4 → 65.6%(p&lt;0.001). 하지만 seed 1회·검증 65장이라 epoch 선택이 흔들림.</p>
+    </div>
+    <div class="card">
+      <span class="tag no">재현 실패</span>
+      <h3 style="margin-top:8px">6. seed 3회 반복</h3>
+      <p>균형 정확도 평균 low 68.9±1.7% vs hi 68.3±3.1%로 같음. seed별 우세 방향이 2:1로 갈림. 학습 391장 규모에서는 seed 잡음이 효과를 덮습니다. 모델·해상도·crop 쪽 실험은 여기서 종료.</p>
+    </div>
+  </div>
+
+  <h3>7. 라벨 정리본 재학습 (seed 3회 vs 대조군 seed 3회)</h3>
+  <div class="table-wrap"><table>
+    <tr><th>지표</th><th class="n">대조군</th><th class="n">정리본 (153장 제외)</th><th class="n">차이</th></tr>
+    <tr><td>전체 Macro F1</td><td class="n">0.9145 ± 0.0017</td><td class="n">0.9225 ± 0.0050</td><td class="n">+0.8%p</td></tr>
+    <tr><td>무 질병 290장 균형 정확도</td><td class="n">71.0 ± 0.6</td><td class="n">70.1 ± 1.3</td><td class="n">−0.9%p</td></tr>
+    <tr class="hl"><td>일치 166장 균형 정확도 (판정 지표)</td><td class="n">76.8 ± 3.1</td><td class="n">78.2 ± 0.4</td><td class="n">+1.4%p</td></tr>
+    <tr><td>일치 166장 검은무늬 재현율</td><td class="n">64.0 ± 3.4</td><td class="n">75.8 ± 2.9</td><td class="n">+11.8%p</td></tr>
+    <tr><td>일치 166장 노균 재현율</td><td class="n">89.6 ± 4.2</td><td class="n">80.6 ± 2.1</td><td class="n">−9.0%p</td></tr>
+  </table></div>
+  <p>검은무늬 재현율이 오른 만큼 노균 재현율이 내려가, 두 병을 더 잘 구분한 것이 아니라 <b>결정 경계가 옮겨간 것</b>입니다. 기준(10%p)에 한참 못 미쳐 기각했고, 배포 모델은 448px 그대로 둡니다. 제외 기준이 비전문가 1차 육안이므로, 전문가가 확정한 목록으로는 다시 확인할 여지가 있습니다.</p>
+
+  <h3>분석 노트 — 새 학습 없이 예측 파일로 확인한 것</h3>
+  <ul class="clean">
+    <li><b>앙상블은 이득이 없습니다.</b> 448 단독 F1 0.917 &gt; 448+기준선 0.916 &gt; 3개 평균 0.911.</li>
+    <li><b>확신하며 틀립니다.</b> 틀린 무 사진의 노균병 확률 중앙값이 0.79라, 확률 임계값으로 보류하면 무 사진의 60%를 보류하고도 남은 정확도가 75%에 그칩니다. 확률 보정으로 풀 문제가 아닙니다.</li>
+    <li><b>두 병을 "무 잎 병해"로 묶으면</b> 재현율이 검은무늬병 94%, 노균병 99%로 높습니다 → 제품 대응의 근거.</li>
+  </ul>
+</section>
+
+<!-- 7. 성능 지표 -->
+<section id="metrics">
+  <h2><span class="num">07</span>단계별 성과와 성능 개선 지표</h2>
+  <p class="sub">평가 기준별로 묶었습니다. 같은 묶음 안의 숫자끼리만 비교하세요.</p>
+
+  <h3>A. 초기 분할(파일 단위, test 637장) — MVP 단계</h3>
+  <div class="card">
+    <div class="bars">
+      <div class="bar-row"><span class="name">구 데이터 ResNet50</span><div class="bar-track"><div class="bar-fill alt" style="width:91.2%"></div></div><span class="v">91.2%</span></div>
+      <div class="bar-row"><span class="name">확장 데이터 ResNet50</span><div class="bar-track"><div class="bar-fill" style="width:93.1%"></div></div><span class="v">93.1%</span></div>
+      <div class="bar-row"><span class="name">무노균병 (구 → 신)</span><div class="bar-track"><div class="bar-fill bad" style="width:10.5%"></div></div><span class="v">10.5%</span></div>
+      <div class="bar-row"><span class="name"></span><div class="bar-track"><div class="bar-fill" style="width:71.1%"></div></div><span class="v">71.1%</span></div>
+    </div>
+    <p class="caption">test 정확도. 이 분할은 분할 간 중복 6쌍이 있어 참고값입니다.</p>
+  </div>
+
+  <h3>B. 공식 분할 val 4,070장 — 전체 데이터 단계</h3>
+  <div class="table-wrap"><table>
+    <tr><th>모델</th><th class="n">정확도</th><th class="n">Macro F1</th><th class="n">무검은무늬병</th><th class="n">무노균병</th><th>상태</th></tr>
+    <tr><td>전체 데이터 기준 (256)</td><td class="n">99.43%</td><td class="n">0.9608</td><td class="n">90.8%</td><td class="n">79.2%</td><td>기준</td></tr>
+    <tr><td>256 미세조정</td><td class="n">99.58%</td><td class="n">0.9624</td><td class="n">93.4%</td><td class="n">70.8%</td><td><span class="tag hold">보류</span></td></tr>
+    <tr><td>384 미세조정</td><td class="n">99.56%</td><td class="n">0.9600</td><td class="n">100%</td><td class="n">62.5%</td><td><span class="tag no">미채택</span></td></tr>
+    <tr><td>10클래스 (256, 기타 추가)</td><td class="n">99.57%</td><td class="n">0.958</td><td class="n">70/76</td><td class="n">17/24</td><td><span class="tag ok">서버 운영</span></td></tr>
+    <tr class="hl"><td>10클래스 448px 재학습</td><td class="n">99.68%</td><td class="n">0.962</td><td class="n">71/76</td><td class="n">16/24</td><td><span class="tag ok">교체 인계</span></td></tr>
+  </table></div>
+  <p class="caption">10클래스 행은 val 4,635장(기타 포함). 무노균병 24장은 한 장이 4.2%p라 잡음 범위입니다. 이 val은 학습 작업자와 겹쳐 일반화를 말해 주지 않습니다.</p>
+
+  <h3>C. 작업자 분리 시험셋 11,434장 — 현재 판정 기준</h3>
+  <div class="card">
+    <div class="legend"><span><i style="background:#9cc9ad"></i>기준선 256px</span><span><i style="background:var(--green)"></i>448px (채택)</span></div>
+    <div class="pair"><span>고추탄저병</span><div class="stack">
+      <div class="mini"><div class="bar-track"><div class="bar-fill alt" style="width:93.4%"></div></div><span class="v">93.4</span></div>
+      <div class="mini"><div class="bar-track"><div class="bar-fill" style="width:94.7%"></div></div><span class="v">94.7</span></div></div></div>
+    <div class="pair"><span>무검은무늬병</span><div class="stack">
+      <div class="mini"><div class="bar-track"><div class="bar-fill alt" style="width:53.8%"></div></div><span class="v">53.8</span></div>
+      <div class="mini"><div class="bar-track"><div class="bar-fill warn" style="width:54.2%"></div></div><span class="v">54.2</span></div></div></div>
+    <div class="pair"><span>무노균병</span><div class="stack">
+      <div class="mini"><div class="bar-track"><div class="bar-fill alt" style="width:74.4%"></div></div><span class="v">74.4</span></div>
+      <div class="mini"><div class="bar-track"><div class="bar-fill" style="width:88.5%"></div></div><span class="v">88.5</span></div></div></div>
+    <div class="pair"><span>배추검은썩음병</span><div class="stack">
+      <div class="mini"><div class="bar-track"><div class="bar-fill alt" style="width:95.7%"></div></div><span class="v">95.7</span></div>
+      <div class="mini"><div class="bar-track"><div class="bar-fill" style="width:97.0%"></div></div><span class="v">97.0</span></div></div></div>
+    <div class="pair"><span>배추노균병</span><div class="stack">
+      <div class="mini"><div class="bar-track"><div class="bar-fill alt" style="width:96.0%"></div></div><span class="v">96.0</span></div>
+      <div class="mini"><div class="bar-track"><div class="bar-fill" style="width:98.4%"></div></div><span class="v">98.4</span></div></div></div>
+    <div class="pair"><span>정상·기타</span><div class="stack">
+      <div class="mini"><div class="bar-track"><div class="bar-fill alt" style="width:99.2%"></div></div><span class="v">99.2+</span></div>
+      <div class="mini"><div class="bar-track"><div class="bar-fill" style="width:99.9%"></div></div><span class="v">99.9+</span></div></div></div>
+    <p class="caption">클래스별 재현율(%). 고추흰가루병은 기준선 97.9%. 전체 정확도 98.0 → 98.7%, Macro F1 0.899 → 0.917.</p>
+  </div>
+
+  <h3>D. 서버 모델과 새 촬영자 성능의 격차</h3>
+  <div class="table-wrap"><table>
+    <tr><th>클래스</th><th class="n">작업자 분리 기준선</th><th class="n">서버 모델 (학습 작업자 포함, 참고)</th></tr>
+    <tr><td>무검은무늬병</td><td class="n">53.8%</td><td class="n">98.6%</td></tr>
+    <tr><td>무노균병</td><td class="n">74.4%</td><td class="n">98.7%</td></tr>
+    <tr><td>전체 Macro F1</td><td class="n">0.899</td><td class="n">0.996</td></tr>
+  </table></div>
+  <p class="caption">서버 모델은 시험 작업자의 사진을 학습했으므로, 이 격차가 곧 "같은 작업자로 잰 점수가 얼마나 낙관적인가"를 보여 줍니다.</p>
+
+  <h3>E. 판별 불가(기타) 클래스의 효과</h3>
+  <div class="card">
+    <div class="bars">
+      <div class="bar-row"><span class="name">흐림 σ2 · 9클래스 정확도</span><div class="bar-track"><div class="bar-fill warn" style="width:77.8%"></div></div><span class="v">77.8%</span></div>
+      <div class="bar-row"><span class="name">흐림 σ2 · 10클래스 정확도</span><div class="bar-track"><div class="bar-fill" style="width:98.8%"></div></div><span class="v">98.8%</span></div>
+      <div class="bar-row"><span class="name">작물 사진 → 기타 (σ2)</span><div class="bar-track"><div class="bar-fill" style="width:2%"></div></div><span class="v">0.34%</span></div>
+    </div>
+    <p class="caption">σ4·흔들림·저해상도처럼 잎을 알아보기 어려운 사진은 24~74%가 기타로 가며, 이때 9클래스 모델 정확도도 25~70%로 무너집니다. 그래서 안내 문구는 "작물 아님"이 아니라 "작물 잎을 찾지 못했어요"입니다.</p>
+  </div>
+
+  <h3>단계별 성과 요약</h3>
+  <div class="table-wrap"><table>
+    <tr><th>단계</th><th>성과</th><th>정량 지표</th></tr>
+    <tr><td>1 MVP</td><td>9클래스 서비스 가능한 첫 모델</td><td>test 91.2 → 93.1%, 무노균병 10.5 → 71.1%</td></tr>
+    <tr><td>2 혼동 분석</td><td>오류의 59%가 무 쌍임을 특정, 유도촬영 설계</td><td>TTA +0.1%p(무의미) 확인</td></tr>
+    <tr><td>3~4 신뢰성 점검</td><td>분할 오염·작업자 누수 발견, 평가 체계 재정의</td><td>중복 6쌍, 공식 val 4,063/4,070 작업자 겹침</td></tr>
+    <tr><td>5 전체 데이터</td><td>데이터 8.6배 확장(4,246 → 36,583)</td><td>val 99.43%, F1 0.9608</td></tr>
+    <tr><td>6 기타 클래스</td><td>엉뚱한 사진의 오진단 차단</td><td>흐림 σ2 정확도 77.8 → 98.8%</td></tr>
+    <tr><td>7 작업자 분리 실험</td><td>새 촬영자 기준 판정 체계, 448px 채택</td><td>F1 0.899 → 0.917, 무노균병 +14.1%p</td></tr>
+    <tr><td>8 라벨 재검토</td><td>무 혼동의 원인을 라벨 품질로 특정</td><td>검은무늬 라벨 중 양상 일치 47%</td></tr>
+  </table></div>
+</section>
+
+<!-- 8. 제품 대응 -->
+<section id="product">
+  <h2><span class="num">08</span>제품 쪽 대응 — 혼동쌍 유도촬영</h2>
+  <p class="sub">모델로 풀리지 않는 혼동은 사진을 한 장 더 받아서 풉니다. 노균병의 흰 곰팡이는 잎 뒷면에서 확인되기 때문입니다.</p>
+  <div class="grid g2">
+    <div class="card">
+      <h3 style="margin-top:0">재촬영 조건 (decision-v3)</h3>
+      <ul class="clean">
+        <li>첫 사진의 1순위가 무 질병이면 확률 차이와 관계없이 <b>잎 뒷면 근접 재촬영</b>을 요청합니다(trigger=top1).</li>
+        <li>배추 혼동쌍(검은썩음병 ↔ 노균병)은 상위 두 후보가 쌍이고 차이가 0.20 미만일 때 잎맥·가장자리 재촬영.</li>
+        <li>이전 게이트(쌍 일치 조건)는 무 오류의 49%만 잡았습니다 — 나머지 오답은 2순위가 다른 클래스였기 때문.</li>
+      </ul>
+    </div>
+    <div class="card">
+      <h3 style="margin-top:0">다시점 융합</h3>
+      <p>두 번째 사진은 판별 부위를 겨냥해 찍은 것이므로 더 큰 가중치를 줍니다.</p>
+      <p><code>fused[c] = 0.4 · 첫 사진[c] + 0.6 · 재촬영[c]</code></p>
+      <p class="caption">판별 단서: 뒷면 회백색 포자층 → 노균병 / 뒷면 깨끗 + 앞면 동심원 병반 → 검은무늬병. 배포 전 식물병리 자료로 검증이 필요합니다.</p>
+    </div>
+  </div>
+</section>
+
+<!-- 9. 결론 -->
+<section id="next">
+  <h2><span class="num">09</span>결론과 다음 단계</h2>
+  <div class="callout ok">
+    <b>지금까지의 결론</b>
+    <ul class="clean">
+      <li>성능 판정은 <b>작업자 분리 시험셋</b>으로, 비교는 <b>seed 3회 이상</b>으로 합니다. 공식 val 99%대 숫자는 회귀 확인용입니다.</li>
+      <li>모델 쪽에서 효과가 확인된 것은 <b>448px 입력</b> 하나입니다. 백본·앙상블·2단계 분류기·crop·라벨 정리는 기각했습니다.</li>
+      <li>무 두 질병의 혼동은 <b>라벨 품질과 데이터 규모</b>의 문제이며, 무검은무늬병 54%는 현재 데이터로 넘기 어려운 상한입니다.</li>
+    </ul>
+  </div>
+  <div class="table-wrap"><table>
+    <tr><th>우선순위</th><th>할 일</th><th>이유</th></tr>
+    <tr><td class="n">1</td><td>448px 10클래스 모델 서버 교체</td><td>교체 인계 문서(<code>MODEL_SWAP_448.md</code>) 작성 완료, 운영 측 반영</td></tr>
+    <tr><td class="n">2</td><td>전문가 재라벨 (시험셋 정답 교정)</td><td>검은무늬병 라벨 우선 112장 → 키트(review.html + 원본 crop 789장) 준비됨</td></tr>
+    <tr><td class="n">3</td><td>무 잎 사진 직접 수집</td><td>11월 중순 이후·피해가 심한 검은무늬병, 잎 뒷면 근접 사진. 학습에 심한 검은무늬병이 거의 없음</td></tr>
+    <tr><td class="n">4</td><td>별도 평가셋 확보</td><td>시험셋을 여러 번 써서 생긴 선택 편향 제거, 다른 지역·촬영자 성능 측정</td></tr>
+    <tr><td class="n">5</td><td>고추탄저병 작업자 9315z 사진 육안 확인</td><td>탄저병 → 정상 오답 16장 중 13장이 한 작업자</td></tr>
+    <tr><td class="n">6</td><td>오프라인·보드 변환 검증</td><td>10클래스 ONNX 묶음 재생성, RKNN 변환 정확도·지연·메모리 미검증</td></tr>
+  </table></div>
+</section>
+</main>
+
+<footer>
+  크래파스 팀 · Cropy 작물 병해 진단 프로젝트 · 원 기록은 Cropy 저장소의 <code>docs/MODEL_SPEC.md</code>, <code>ml/README.md</code>, <code>ml/worker_split_v1/*.json</code>, <code>report/AI_모델_개선_보고서_20261006.md</code>, <code>output/colab/split_audit_20260918/report.md</code>를 따릅니다. 육안 양상 분류는 전문가 판정이 아닌 1차 검토입니다.
+</footer>
+</body>
+</html>
