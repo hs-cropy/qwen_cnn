@@ -102,6 +102,29 @@ ul.clean{padding-left:20px;margin:8px 0}
 ul.clean li{margin:4px 0}
 footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);font-size:13px;border-top:1px solid var(--line)}
 </style>
+<style>
+:root{ --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --grid:#ececef; --axis:#8a8f98; }
+@media (prefers-color-scheme: dark){ :root{ --s1:#3987e5; --s2:#d95926; --s3:#199e70; --grid:#2a2f2c; --axis:#8b928d; } }
+.chart{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 18px 10px;margin:14px 0;position:relative}
+.chart h4{margin:0 0 2px;font-size:16px}
+.chart .desc{margin:0 0 8px;font-size:13.5px;color:var(--text2)}
+.chart .lg{display:flex;flex-wrap:wrap;gap:14px;font-size:13px;color:var(--text2);margin:4px 0 6px}
+.chart .lg span{display:inline-flex;align-items:center;gap:6px}
+.chart .lg i{display:inline-block;width:14px;height:3px;border-radius:2px}
+.chart .lg i.dash{background:none!important;border-top:2px dashed currentColor;height:0}
+.chart svg{display:block;width:100%;height:auto;overflow:visible}
+.chart svg text{font-family:inherit;font-size:11px;fill:var(--axis)}
+.chart svg text.dl{font-size:11.5px;font-weight:700;fill:var(--text)}
+.chart .tip{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);box-shadow:0 4px 16px rgba(0,0,0,.12);border-radius:10px;padding:8px 10px;font-size:12.5px;line-height:1.5;opacity:0;transition:opacity .1s;white-space:nowrap;z-index:2}
+.chart .tip b{display:block;margin-bottom:2px}
+.chart .tip .row{display:flex;gap:8px;align-items:center;justify-content:space-between}
+.chart .tip .row i{display:inline-block;width:10px;height:3px;border-radius:2px;margin-right:6px}
+.chart details{margin-top:6px;font-size:13px;color:var(--text2)}
+.chart details table{min-width:0;font-size:12.5px}
+.chart details th,.chart details td{padding:4px 8px}
+.chart-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+@media (max-width:860px){.chart-grid{grid-template-columns:1fr}}
+</style>
 </head>
 <body>
 
@@ -109,7 +132,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   <span class="brand">Cropy CNN</span>
   <div class="nav-links">
     <a href="#summary">요약</a><a href="#model">모델</a><a href="#timeline">연구 과정</a><a href="#ledger">실험 대장</a><a href="#dataset">데이터셋</a>
-    <a href="#labels">라벨 문제</a><a href="#causes">원인 조사</a><a href="#experiments">실험</a><a href="#metrics">성능 지표</a><a href="#deploy">운영 현황</a><a href="#logs">학습 기록</a><a href="#next">결론·다음 단계</a>
+    <a href="#labels">라벨 문제</a><a href="#causes">원인 조사</a><a href="#experiments">실험</a><a href="#metrics">성능 지표</a><a href="#curves">학습 곡선</a><a href="#deploy">운영 현황</a><a href="#logs">학습 기록</a><a href="#next">결론·다음 단계</a>
   </div>
 </div></nav>
 
@@ -145,6 +168,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
       <li><a href="#causes">무 질병 오류의 원인 조사</a></li>
       <li><a href="#experiments">작업자 분리 시험셋 실험 1~7</a></li>
       <li><a href="#metrics">단계별 성과와 성능 개선 지표</a></li>
+      <li><a href="#curves">학습 곡선 (로그 기반 그래프)</a></li>
       <li><a href="#deploy">운영 서버 현황</a></li>
       <li><a href="#logs">학습 기록 보관 현황</a></li>
       <li><a href="#product">제품 쪽 대응 (유도촬영)</a></li>
@@ -720,9 +744,33 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
   </table></div>
 </section>
 
+<!-- 학습 곡선 -->
+<section id="curves">
+  <h2><span class="num">10</span>학습 곡선 — 로그로 다시 그린 그래프</h2>
+  <p class="sub">Drive에 남은 epoch별 기록(<code>history.json</code>)으로 그렸습니다. 그래프마다 검증 데이터가 다르니 설명의 평가 기준을 확인하세요. 선 위에 마우스를 올리면 값이 보이고, 각 그래프 아래 "표로 보기"에 원 수치가 있습니다. ● 표시는 모델 선택 기준(검증 Macro F1 최고)으로 고른 epoch입니다.</p>
+  <h3>9월 · 작업자 분할 v0</h3>
+<div class="chart" data-chart id="c-v0"><h4>작업자 분할 v0 — 224 vs 256 입력 (20 epoch)</h4><p class="desc">9월 작업자 단위 분할(val 785장). 학습 정확도는 몇 epoch 만에 100% 가까이 붙지만 검증 정확도는 90~92%에서 멈춥니다 — 데이터가 적을 때의 전형적인 과적합입니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "작업자 분할 v0 — 224 vs 256 입력 (20 epoch)", "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "series": [{"name": "학습 정확도 (224)", "v": [0.7258064516129032, 0.9219208211143695, 0.9512463343108505, 0.9725073313782991, 0.9802052785923753, 0.9871700879765396, 0.9890029325513197, 0.9919354838709676, 0.9948680351906158, 0.9945014662756598, 0.9948680351906158, 0.9978005865102639, 0.9970674486803519, 0.99633431085044, 0.9956011730205279, 0.9978005865102639, 0.998900293255132, 0.998900293255132, 0.999266862170088, 0.999266862170088], "c": 2, "dash": true}, {"name": "검증 정확도 224", "v": [0.8662420382165605, 0.8815286624203822, 0.9006369426751593, 0.9159235668789809, 0.9057324840764331, 0.8929936305732484, 0.9095541401273886, 0.9044585987261147, 0.9031847133757962, 0.9006369426751593, 0.9095541401273886, 0.9082802547770701, 0.8955414012738854, 0.8980891719745223, 0.9082802547770701, 0.9121019108280255, 0.9159235668789809, 0.9159235668789809, 0.9159235668789809, 0.9184713375796179], "c": 0, "best": 19}, {"name": "검증 정확도 256", "v": [0.8649681528662421, 0.89171974522293, 0.9121019108280255, 0.9082802547770701, 0.910828025477707, 0.8968152866242038, 0.910828025477707, 0.9146496815286624, 0.8980891719745223, 0.9171974522292994, 0.9082802547770701, 0.913375796178344, 0.9146496815286624, 0.9146496815286624, 0.9121019108280255, 0.9197452229299363, 0.9235668789808917, 0.9235668789808917, 0.9248407643312102, 0.9210191082802548], "c": 1, "best": 18}], "ymin": 0.7, "ymax": 1.0, "yticks": [0.7, 0.8, 0.9, 1.0], "unit": "%", "xlabel": "epoch", "h": 240, "w": 640}</script></div>
+  <h3>10월 · 전체 데이터 학습</h3>
+<div class="chart" data-chart id="c-full"><h4>전체 데이터 기준 모델 (36,583장, 20 epoch)</h4><p class="desc">공식 val 4,070장. Macro F1은 3 epoch에서 가장 높고 이후 넘지 못합니다. 무노균병(24장) 재현율은 epoch마다 크게 흔들려 한 장 차이(4.2%p)가 지표를 좌우합니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "전체 데이터 기준 모델 (36,583장, 20 epoch)", "x": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20], "series": [{"name": "검증 Macro F1", "v": [0.9433557489598682, 0.9383310041066905, 0.9608033962143776, 0.9450273565806325, 0.9463199412393474, 0.9389297346745415, 0.9492858147530386, 0.9446363966998851, 0.9433073152707093, 0.9537482575066174, 0.9381240190486569, 0.9397509622233589, 0.945251427004544, 0.9515391704558807, 0.9429270971654061, 0.9473407516862721, 0.9463117782174515, 0.9442929852472504, 0.9512533125023458, 0.9588126320282545], "c": 0, "best": 2}, {"name": "무노균병 재현율", "v": [0.8333333333333334, 0.75, 0.7916666666666666, 0.625, 0.8333333333333334, 0.625, 0.7916666666666666, 0.6666666666666666, 0.6666666666666666, 0.6666666666666666, 0.5416666666666666, 0.625, 0.625, 0.6666666666666666, 0.625, 0.625, 0.5833333333333334, 0.5416666666666666, 0.5833333333333334, 0.6666666666666666], "c": 1}, {"name": "무검은무늬병 재현율", "v": [0.868421052631579, 0.8157894736842105, 0.9078947368421053, 0.9342105263157895, 0.8552631578947368, 0.9078947368421053, 0.868421052631579, 0.881578947368421, 0.9078947368421053, 0.9078947368421053, 0.9473684210526315, 0.9078947368421053, 0.8947368421052632, 0.9342105263157895, 0.9210526315789473, 0.9342105263157895, 0.9473684210526315, 0.9078947368421053, 0.9210526315789473, 0.9342105263157895], "c": 2}], "ymin": 0.5, "ymax": 1.0, "yticks": [0.5, 0.6, 0.7, 0.8, 0.9, 1.0], "unit": "%", "xlabel": "epoch", "h": 240, "w": 640}</script></div>
+  <h3>10월 · 미세조정</h3>
+<div class="chart-grid"><div class="chart" data-chart id="c-ft-f1"><h4>미세조정 256 vs 384 — Macro F1</h4><p class="desc">epoch 0은 학습 전 평가(같은 시작 모델을 각 입력 크기로 평가). 256은 4 epoch, 384는 1 epoch에서 최고.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "미세조정 256 vs 384 — Macro F1", "x": [0, 1, 2, 3, 4, 5], "series": [{"name": "256", "v": [0.960803, 0.9575180082179868, 0.9507756629327174, 0.9540659510585496, 0.9624362614681657, 0.9550912692527204], "c": 0, "best": 4}, {"name": "384", "v": [0.942142, 0.960004569771328, 0.9437497101601576, 0.9541882169548302, 0.9404803472259192, 0.9517978169402309], "c": 1, "best": 1}], "ymin": 0.93, "ymax": 0.97, "yticks": [0.93, 0.94, 0.95, 0.96, 0.97], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div><div class="chart" data-chart id="c-ft-mu"><h4>미세조정 256 vs 384 — 무노균병 재현율</h4><p class="desc">시작 모델은 256 입력에서 19/24(79.2%). 미세조정 중 모든 epoch에서 그보다 낮습니다(384의 학습 전 값은 기록 없음).</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "미세조정 256 vs 384 — 무노균병 재현율", "x": [0, 1, 2, 3, 4, 5], "series": [{"name": "256", "v": [0.7916666666666666, 0.6666666666666666, 0.7083333333333334, 0.75, 0.7083333333333334, 0.7083333333333334], "c": 0}, {"name": "384", "v": [null, 0.625, 0.6666666666666666, 0.6666666666666666, 0.625, 0.625], "c": 1}], "ymin": 0.6, "ymax": 0.85, "yticks": [0.6, 0.65, 0.7, 0.75, 0.8, 0.85], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div></div>
+  <h3>10월 · 반전 일관성 학습</h3>
+<div class="chart-grid"><div class="chart" data-chart id="c-flip-f1"><h4>반전 일관성 학습 — Macro F1</h4><p class="desc">대조군과 실험군(JS 일관성 손실)이 거의 겹칩니다. 둘 다 시작 모델(F1 0.9608)을 넘지 못했습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "반전 일관성 학습 — Macro F1", "x": [1, 2, 3, 4, 5], "series": [{"name": "대조군", "v": [0.9531235147472275, 0.9534281046779467, 0.9534649993906178, 0.9571331527826337, 0.9566042454086132], "c": 0}, {"name": "실험군 (JS 손실)", "v": [0.9531235147472275, 0.9534281046779467, 0.9534649993906178, 0.9571331527826337, 0.9566042454086132], "c": 1, "dash": true}], "ymin": 0.952, "ymax": 0.958, "yticks": [0.952, 0.953, 0.954, 0.955, 0.956, 0.957, 0.958], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div><div class="chart" data-chart id="c-flip-dis"><h4>반전 일관성 학습 — 좌우 반전 시 판정이 바뀌는 비율</h4><p class="desc">두 선이 대부분 겹치고 차이는 최대 0.02%p입니다. 일관성 손실이 반전 안정성을 거의 바꾸지 못했습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "반전 일관성 학습 — 좌우 반전 시 판정이 바뀌는 비율", "x": [1, 2, 3, 4, 5], "series": [{"name": "대조군", "v": [0.0031941031941031942, 0.0034398034398034397, 0.002702702702702703, 0.0036855036855036856, 0.004914004914004914], "c": 0}, {"name": "실험군 (JS 손실)", "v": [0.0029484029484029483, 0.0034398034398034397, 0.002702702702702703, 0.0036855036855036856, 0.004668304668304668], "c": 1, "dash": true}], "ymin": 0.002, "ymax": 0.006, "yticks": [0.002, 0.003, 0.004, 0.005, 0.006], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div></div>
+  <h3>10월 · 외부 데이터</h3>
+<div class="chart" data-chart id="c-ext"><h4>외부(방글라데시) 무 잎 데이터를 섞은 이어학습</h4><p class="desc">epoch 0은 서버 모델 그대로. 방글라데시 검증 정확도는 빠르게 오르지만(같은 출처 사진이라 누수 가능), AI Hub 검증의 무노균병 재현율은 오히려 떨어집니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "외부(방글라데시) 무 잎 데이터를 섞은 이어학습", "x": [0, 1, 2, 3, 4], "series": [{"name": "AI Hub 검증 Macro F1", "v": [0.9585, 0.9525, 0.954, 0.9452, 0.9504], "c": 0}, {"name": "AI Hub 무노균병 재현율", "v": [0.7083, 0.6667, 0.625, 0.5417, 0.5417], "c": 1}, {"name": "방글라데시 검증 정확도", "v": [0.0859, 0.9982, 1.0, 0.9982, 1.0], "c": 2, "dash": true}], "ymin": 0.0, "ymax": 1.0, "yticks": [0.0, 0.2, 0.4, 0.6, 0.8, 1.0], "unit": "%", "xlabel": "epoch", "h": 250, "w": 640}</script></div>
+  <h3>10월 말 · 10클래스와 448px 재학습</h3>
+<div class="chart-grid"><div class="chart" data-chart id="c-10-f1"><h4>10클래스 모델 — 256(운영) vs 448(교체 후보), Macro F1</h4><p class="desc">공식 val 4,635장(기타 포함). 학습 작업자와 겹치는 val이라 회귀 확인용입니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "10클래스 모델 — 256(운영) vs 448(교체 후보), Macro F1", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "256 (운영)", "v": [0.9398110289712729, 0.9543944679481946, 0.9288723793340286, 0.945929589531986, 0.9468033925964063, 0.9396135985631261, 0.9584795673369919, 0.9438705293292653], "c": 0, "best": 6}, {"name": "448 (후보)", "v": [0.9497617529735904, 0.950050223536824, 0.9418085862044384, 0.9541170143132913, 0.9542528873291278, 0.9615855774259341, 0.9598644314726323, 0.9553354983660372], "c": 1, "best": 5}], "ymin": 0.92, "ymax": 0.97, "yticks": [0.92, 0.93, 0.94, 0.95, 0.96, 0.97], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div><div class="chart" data-chart id="c-10-mu"><h4>10클래스 모델 — 무노균병 재현율 (24장)</h4><p class="desc">epoch마다 크게 오갑니다. 24장 표본이라 이 val로는 두 모델을 가를 수 없습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "10클래스 모델 — 무노균병 재현율 (24장)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "256 (운영)", "v": [0.5416666666666666, 0.6666666666666666, 0.7916666666666666, 0.5833333333333334, 0.4583333333333333, 0.5833333333333334, 0.7083333333333334, 0.5416666666666666], "c": 0}, {"name": "448 (후보)", "v": [0.75, 0.625, 0.5416666666666666, 0.625, 0.6666666666666666, 0.6666666666666666, 0.6666666666666666, 0.625], "c": 1}], "ymin": 0.4, "ymax": 0.9, "yticks": [0.4, 0.5, 0.6, 0.7, 0.8, 0.9], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div></div>
+  <h3>10월 말~11월 · 작업자 분리 시험셋 v1 실험</h3>
+<div class="chart" data-chart id="c-v1-f1"><h4>작업자 분리 시험셋 v1 — 검증 Macro F1 (기준선 / ConvNeXt / 448)</h4><p class="desc">검증 작업자 사진(val) 기준. 세 모델 모두 epoch 1~8 동안 0.83~0.89 사이를 오르내릴 뿐 뚜렷하게 오르지 않아, epoch를 늘려도 이득이 없습니다. 448px가 대부분의 epoch에서 위에 있습니다. 최종 판정은 시험셋(11,434장)으로 했습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "작업자 분리 시험셋 v1 — 검증 Macro F1 (기준선 / ConvNeXt / 448)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "기준선 256", "v": [0.8630437388113881, 0.8601341071489322, 0.865446843405613, 0.8295440954232483, 0.8714124850460345, 0.8640048418443925, 0.8754018924260052, 0.8761689271279198], "c": 0, "best": 7}, {"name": "ConvNeXt-Tiny", "v": [0.8603603352657407, 0.8272867098152821, 0.8605199997496067, 0.8797050955718838, 0.8618396260309776, 0.8815328562610979, 0.8799552667935904, 0.8784395455299704], "c": 2, "best": 5}, {"name": "448px", "v": [0.8599761639218817, 0.8817669279453121, 0.8803632476925527, 0.8928736589223988, 0.8833475485026699, 0.8911710138492797, 0.8892906005902322, 0.8867857355028091], "c": 1, "best": 3}], "ymin": 0.82, "ymax": 0.9, "yticks": [0.82, 0.84, 0.86, 0.88, 0.9], "unit": "%", "xlabel": "epoch", "h": 240, "w": 640}</script></div>
+  
+<div class="chart-grid"><div class="chart" data-chart id="c-v1-mu"><h4>작업자 분리 v1 — 무노균병 재현율 (val 49장)</h4><p class="desc">448이 대부분의 epoch에서 기준선보다 높습니다(시험셋 74.4 → 88.5%와 같은 방향).</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "작업자 분리 v1 — 무노균병 재현율 (val 49장)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "기준선 256", "v": [0.8163265306122449, 0.6326530612244898, 0.6938775510204082, 0.6122448979591837, 0.6938775510204082, 0.7551020408163265, 0.7142857142857143, 0.7142857142857143], "c": 0}, {"name": "448px", "v": [0.8367346938775511, 0.5714285714285714, 0.7142857142857143, 0.8571428571428571, 0.8571428571428571, 0.7551020408163265, 0.7755102040816326, 0.7551020408163265], "c": 1}], "ymin": 0.5, "ymax": 0.9, "yticks": [0.5, 0.6, 0.7, 0.8, 0.9], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div><div class="chart" data-chart id="c-v1-bs"><h4>작업자 분리 v1 — 무검은무늬병 재현율 (val 59장)</h4><p class="desc">두 모델 모두 낮고 epoch마다 크게 흔들립니다 — 해상도로 풀리지 않은 부분입니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "작업자 분리 v1 — 무검은무늬병 재현율 (val 59장)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "기준선 256", "v": [0.2033898305084746, 0.288135593220339, 0.2033898305084746, 0.1016949152542373, 0.23728813559322035, 0.15254237288135594, 0.2033898305084746, 0.2542372881355932], "c": 0}, {"name": "448px", "v": [0.2542372881355932, 0.3898305084745763, 0.2711864406779661, 0.2711864406779661, 0.2033898305084746, 0.2711864406779661, 0.2711864406779661, 0.2711864406779661], "c": 1}], "ymin": 0.0, "ymax": 0.5, "yticks": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5], "unit": "%", "xlabel": "epoch", "h": 250, "w": 400}</script></div></div>
+  <h3>11월 · 라벨 정리본</h3>
+<div class="chart" data-chart id="c-clean"><h4>라벨 정리본 vs 대조군 — 검증 Macro F1 (seed 3개 평균)</h4><p class="desc">448px 10클래스, 각 seed 3회 평균. 정리본(무 라벨·양상 불일치 153장 제외)이 검증에서는 조금 높지만, 시험셋 라벨 일치 166장 균형 정확도 차이는 +1.4%p로 기준(10%p)에 못 미쳤습니다.</p><div class="lg"></div><div class="plot"></div><div class="tip" aria-hidden="true"></div><details><summary>표로 보기</summary><div class="tw table-wrap"></div></details><script type="application/json">{"title": "라벨 정리본 vs 대조군 — 검증 Macro F1 (seed 3개 평균)", "x": [1, 2, 3, 4, 5, 6, 7, 8], "series": [{"name": "대조군", "v": [0.8645635551983468, 0.8877026995970811, 0.875855947529873, 0.8965589805493991, 0.8915855920575632, 0.8905582936502228, 0.890990286871088, 0.8928838127295631], "c": 0}, {"name": "정리본", "v": [0.9050856883251518, 0.8977012151593154, 0.8950849392223441, 0.9061738410143919, 0.9021721723384061, 0.9097292322749536, 0.9128583403408389, 0.9122074855997147], "c": 1}], "ymin": 0.86, "ymax": 0.92, "yticks": [0.86, 0.88, 0.9, 0.92], "unit": "%", "xlabel": "epoch", "h": 230, "w": 640}</script></div>
+</section>
+
 <!-- 운영 현황 -->
 <section id="deploy">
-  <h2><span class="num">10</span>운영 서버 현황 <small style="font-size:15px;color:var(--muted);font-weight:600">2026-11-06 확인</small></h2>
+  <h2><span class="num">11</span>운영 서버 현황 <small style="font-size:15px;color:var(--muted);font-weight:600">2026-11-06 확인</small></h2>
   <p class="sub">배포 서버(<code>43.202.14.204.sslip.io</code>)의 공개 API(<code>/api/v1/ready</code>, <code>/api/v1/capabilities</code>, <code>/api/v1/offline/manifest</code>)로 확인한 실제 적용 상태입니다.</p>
   <div class="grid g3">
     <div class="card kpi good"><div class="label">서버 추론</div><div class="value">정상</div><div class="note">ready · DB 연결 · 실제 모델 로드<br>prediction_mode = model</div></div>
@@ -744,7 +792,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
 
 <!-- 학습 기록 -->
 <section id="logs">
-  <h2><span class="num">11</span>학습 기록 보관 현황</h2>
+  <h2><span class="num">12</span>학습 기록 보관 현황</h2>
   <p class="sub">epoch별 기록(<code>history.json</code>·<code>history.jsonl</code>)과 선택 모델의 검증 지표(<code>val_metrics.json</code>)가 어디에 있는지 정리했습니다. 2026-11-06 Google Drive와 Cropy 저장소를 대조한 결과입니다.</p>
   <div class="table-wrap"><table>
     <tr><th>시기</th><th>실행</th><th>epoch별 기록</th><th>보관 위치</th></tr>
@@ -768,7 +816,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
 
 <!-- 8. 제품 대응 -->
 <section id="product">
-  <h2><span class="num">12</span>제품 쪽 대응 — 혼동쌍 유도촬영</h2>
+  <h2><span class="num">13</span>제품 쪽 대응 — 혼동쌍 유도촬영</h2>
   <p class="sub">모델로 풀리지 않는 혼동은 사진을 한 장 더 받아서 풉니다. 노균병의 흰 곰팡이는 잎 뒷면에서 확인되기 때문입니다.</p>
   <div class="grid g2">
     <div class="card">
@@ -790,7 +838,7 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
 
 <!-- 9. 결론 -->
 <section id="next">
-  <h2><span class="num">13</span>결론과 다음 단계</h2>
+  <h2><span class="num">14</span>결론과 다음 단계</h2>
   <div class="callout ok">
     <b>지금까지의 결론</b>
     <ul class="clean">
@@ -814,5 +862,63 @@ footer{max-width:1080px;margin:0 auto;padding:32px 20px 48px;color:var(--muted);
 <footer>
   크래파스 팀 · Cropy 작물 병해 진단 프로젝트 · 원 기록은 Cropy 저장소의 <code>docs/MODEL_SPEC.md</code>, <code>ml/README.md</code>, <code>ml/worker_split_v1/*.json</code>, <code>report/AI_모델_개선_보고서_20261006.md</code>, <code>output/colab/</code>의 실험 폴더(split_audit, val_source_comparison, full_label_audit, group_baseline_analysis, group256_analysis, error_review, radish_surface_review, full_radish_error_review, radish_pair_review, full_resize_ablation, resolution_finetune), <code>cnn_cause_audit_20261013</code>, PR #22·#23·#24·#55·#107·#110·#112·#113·#131을 따릅니다. 7월 사전 실험 수치는 개인 작업 기록입니다. 육안 양상 분류는 전문가 판정이 아닌 1차 검토입니다.
 </footer>
+<script>
+(function(){
+const COLORS=['var(--s1)','var(--s2)','var(--s3)'];
+function fmt(v,u){ if(v==null) return '—'; return u==='%'? (v*100).toFixed(Math.abs(v)<0.02?2:1)+'%' : v.toFixed(3); }
+function render(el){
+  const C=JSON.parse(el.querySelector('script[type="application/json"]').textContent);
+  const W=C.w||640,H=C.h||240,m={l:44,r:(C.w&&C.w<500)?100:150,t:10,b:30};
+  const xs=C.x, n=xs.length, iw=W-m.l-m.r, ih=H-m.t-m.b;
+  const lo=C.ymin, hi=C.ymax;
+  const X=i=> m.l + (n===1?iw/2: iw*i/(n-1));
+  const Y=v=> m.t + ih*(1-(v-lo)/(hi-lo));
+  const ns='http://www.w3.org/2000/svg';
+  const svg=document.createElementNS(ns,'svg'); svg.setAttribute('viewBox',`0 0 ${W} ${H}`); svg.setAttribute('role','img'); svg.setAttribute('aria-label',C.title);
+  const add=(tag,attrs,txt)=>{const e=document.createElementNS(ns,tag); for(const k in attrs) e.setAttribute(k,attrs[k]); if(txt!=null) e.textContent=txt; svg.appendChild(e); return e;};
+  const ticks=C.yticks; const st=ticks.length>1?Math.abs(ticks[1]-ticks[0]):0.1; const dec=st<0.001?2:(st<0.01?1:0);
+  ticks.forEach(t=>{ add('line',{x1:m.l,x2:W-m.r,y1:Y(t),y2:Y(t),stroke:'var(--grid)','stroke-width':1}); add('text',{x:m.l-6,y:Y(t)+4,'text-anchor':'end'}, C.unit==='%'? (t*100).toFixed(dec)+'%' : t.toFixed(2)); });
+  const step=Math.max(1,Math.ceil(n/10));
+  xs.forEach((x,i)=>{ if(i%step===0||i===n-1) add('text',{x:X(i),y:H-m.b+16,'text-anchor':'middle'},x); });
+  add('text',{x:m.l+iw/2,y:H-2,'text-anchor':'middle'},C.xlabel||'epoch');
+  if(C.marker!=null){ const i=xs.indexOf(C.marker.x); if(i>=0){ add('line',{x1:X(i),x2:X(i),y1:m.t,y2:m.t+ih,stroke:'var(--axis)','stroke-dasharray':'3 3','stroke-width':1}); add('text',{x:X(i)+4,y:m.t+10},C.marker.label); } }
+  const labels=[];
+  C.series.forEach((s,k)=>{
+    const col=COLORS[s.c!=null?s.c:k]; let d='';
+    s.v.forEach((v,i)=>{ if(v==null) return; d+=(d?'L':'M')+X(i).toFixed(1)+' '+Y(v).toFixed(1); });
+    add('path',{d,fill:'none',stroke:col,'stroke-width':2,'stroke-linejoin':'round','stroke-linecap':'round','stroke-dasharray':s.dash?'5 4':''});
+    if(s.best!=null){ const v=s.v[s.best]; add('circle',{cx:X(s.best),cy:Y(v),r:4.5,fill:col,stroke:'var(--surface)','stroke-width':2}); }
+    let li=s.v.length-1; while(li>0&&s.v[li]==null) li--;
+    labels.push({y:Y(s.v[li]),x:X(li),t:s.name,col});
+  });
+  labels.sort((a,b)=>a.y-b.y); for(let i=1;i<labels.length;i++){ if(labels[i].y-labels[i-1].y<13) labels[i].y=labels[i-1].y+13; }
+  labels.forEach(l=>add('text',{x:l.x+8,y:l.y+4,class:'dl'},l.t));
+  const cross=add('line',{x1:0,x2:0,y1:m.t,y2:m.t+ih,stroke:'var(--axis)','stroke-width':1,opacity:0});
+  const dots=C.series.map((s,k)=>add('circle',{r:4,fill:COLORS[s.c!=null?s.c:k],stroke:'var(--surface)','stroke-width':2,opacity:0}));
+  const hit=add('rect',{x:m.l-10,y:m.t,width:iw+20,height:ih,fill:'transparent'});
+  el.querySelector('.plot').appendChild(svg);
+  const tip=el.querySelector('.tip');
+  function show(i){
+    cross.setAttribute('x1',X(i)); cross.setAttribute('x2',X(i)); cross.setAttribute('opacity',1);
+    let h=`<b>${C.xlabel||'epoch'} ${xs[i]}</b>`;
+    C.series.forEach((s,k)=>{ const v=s.v[i]; const dt=dots[k]; if(v==null){dt.setAttribute('opacity',0);} else {dt.setAttribute('cx',X(i)); dt.setAttribute('cy',Y(v)); dt.setAttribute('opacity',1);} h+=`<div class="row"><span><i style="background:${COLORS[s.c!=null?s.c:k]}"></i>${s.name}</span><span>${fmt(v,C.unit)}</span></div>`; });
+    tip.innerHTML=h; tip.style.opacity=1;
+    const box=svg.getBoundingClientRect(), pb=el.getBoundingClientRect(); const px=box.left-pb.left+X(i)/W*box.width;
+    tip.style.top=(box.top-pb.top+8)+'px'; const tw=tip.offsetWidth; tip.style.left=Math.min(Math.max(px+12,8), pb.width-tw-8)+'px'; if(px+12+tw>pb.width-8) tip.style.left=Math.max(px-tw-12,8)+'px';
+  }
+  function hide(){ tip.style.opacity=0; cross.setAttribute('opacity',0); dots.forEach(d=>d.setAttribute('opacity',0)); }
+  function idx(ev){ const box=svg.getBoundingClientRect(); const cx=(ev.clientX-box.left)/box.width*W; let i=Math.round((cx-m.l)/(n===1?1:iw/(n-1))); return Math.max(0,Math.min(n-1,i)); }
+  hit.addEventListener('mousemove',e=>show(idx(e))); hit.addEventListener('mouseleave',hide);
+  hit.addEventListener('touchstart',e=>show(idx(e.touches[0])),{passive:true});
+  // legend + table
+  const lg=el.querySelector('.lg'); lg.innerHTML=C.series.map((s,k)=>`<span><i class="${s.dash?'dash':''}" style="background:${COLORS[s.c!=null?s.c:k]};color:${COLORS[s.c!=null?s.c:k]}"></i>${s.name}</span>`).join('') + (C.series.some(s=>s.best!=null)?'<span>● 선택된 epoch</span>':'');
+  let t='<table><tr><th>'+(C.xlabel||'epoch')+'</th>'+C.series.map(s=>'<th class="n">'+s.name+'</th>').join('')+'</tr>';
+  xs.forEach((x,i)=>{ t+='<tr><td>'+x+'</td>'+C.series.map(s=>'<td class="n">'+fmt(s.v[i],C.unit)+'</td>').join('')+'</tr>'; });
+  el.querySelector('details .tw').innerHTML=t+'</table>';
+}
+document.addEventListener('DOMContentLoaded',()=>document.querySelectorAll('.chart[data-chart]').forEach(render));
+})();
+</script>
+
 </body>
 </html>
